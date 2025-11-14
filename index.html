@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Legado Escolar — Quiz PM / PC</title>
+
+  <!-- Fontes -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+  <!-- Ícones (substitua pelos arquivos gerados) -->
+  <link rel="icon" href="logo-optimized.png" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Welcome overlay -->
+  <div id="welcome" class="overlay">
+    <div class="welcome-card">
+      <img src="logo-optimized.png" alt="Legado Escolar" class="welcome-logo" />
+      <h1>LEGADO ESCOLAR</h1>
+      <p class="lead">Bem-vindo ao Quiz de PM e PC. Ganhe Pontos de Mérito (PM) e contribua com Pontos de Casa (PC) para sua casa.</p>
+      <div class="welcome-actions">
+        <button id="welcome-start" class="btn-primary">Iniciar</button>
+        <button id="welcome-continue" class="btn-ghost">Continuar progresso salvo</button>
+      </div>
+      <div class="welcome-footer">
+        <label class="theme-switch">
+          <input type="checkbox" id="theme-toggle" />
+          <span>Modo claro</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <main class="container">
+    <header class="site-header">
+      <div class="brand">
+        <img src="logo-optimized.png" alt="Legado Escolar" class="brand-logo"/>
+        <div>
+          <div class="brand-title">LEGADO ESCOLAR</div>
+          <div class="brand-sub">Quiz PM · PC</div>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <div id="save-status" class="save-status">Nenhum progresso salvo</div>
+        <label class="theme-switch-inline">
+          <input type="checkbox" id="theme-toggle-inline" />
+          <span>Modo claro</span>
+        </label>
+      </div>
+    </header>
+
+    <section class="top-panel">
+      <div class="houses" id="house-scores">
+        <div class="house" data-house="Precursores"><strong>Precursores</strong><div class="pc">PC: 0</div></div>
+        <div class="house" data-house="Visionários"><strong>Visionários</strong><div class="pc">PC: 0</div></div>
+        <div class="house" data-house="Guardiões"><strong>Guardiões</strong><div class="pc">PC: 0</div></div>
+        <div class="house" data-house="Solidários"><strong>Solidários</strong><div class="pc">PC: 0</div></div>
+      </div>
+
+      <form id="participant-form" class="participant-form" onsubmit="return false;">
+        <input id="participant-name" placeholder="Seu nome" aria-label="Seu nome" />
+        <select id="participant-house" aria-label="Selecione sua casa">
+          <option>Precursores</option>
+          <option>Visionários</option>
+          <option>Guardiões</option>
+          <option>Solidários</option>
+        </select>
+        <button id="start-btn" class="btn-primary">Iniciar Quiz</button>
+      </form>
+    </section>
+
+    <section id="quiz-area" class="card hidden">
+      <div id="question-container"></div>
+
+      <div class="controls">
+        <button id="prev-btn" class="btn-ghost">Anterior</button>
+
+        <div class="pager">
+          <span id="question-index"></span>
+          <span id="pm-score">PM: 0</span>
+        </div>
+
+        <button id="next-btn" class="btn-ghost">Próxima</button>
+      </div>
+
+      <div class="submit-row">
+        <button id="submit-btn" class="btn-primary">Enviar Resposta</button>
+      </div>
+
+      <div id="loader" class="loader hidden" aria-hidden="true">
+        <div class="spinner"></div>
+      </div>
+    </section>
+
+    <section id="results" class="card hidden">
+      <h2>Resultados</h2>
+      <div id="result-detail"></div>
+      <div class="results-actions">
+        <button id="restart-btn" class="btn-ghost">Reiniciar</button>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <small>Legado Escolar · Sistema de pontuação educacional</small>
+    </footer>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+        </html>

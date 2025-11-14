@@ -8,35 +8,44 @@
   <!-- Fontes -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 
-  <!-- Ícones (substitua pelos arquivos gerados) -->
-  <link rel="icon" href="logo-optimized.jpeg" />
+  <!-- Favicon / logo (substitua pelos arquivos que você colocou em assets/images) -->
+  <link rel="icon" href="assets/images/favicon.ico" />
 
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <!-- Welcome overlay -->
+  <!-- Welcome overlay (IDs usados por app.js: welcome, welcome-start, welcome-continue, theme-toggle) -->
   <div id="welcome" class="overlay">
-    <div class="welcome-card">
-      <img src="logo-optimized.png" alt="Legado Escolar" class="welcome-logo" />
-      <h1>LEGADO ESCOLAR</h1>
+    <div class="welcome-card" role="dialog" aria-labelledby="welcome-title">
+      <picture>
+        <source srcset="assets/images/logo-optimized.webp" type="image/webp">
+        <img src="assets/images/logo-optimized-512.png" alt="Legado Escolar" class="welcome-logo" />
+      </picture>
+
+      <h1 id="welcome-title">LEGADO ESCOLAR</h1>
       <p class="lead">Bem-vindo ao Quiz de PM e PC. Ganhe Pontos de Mérito (PM) e contribua com Pontos de Casa (PC) para sua casa.</p>
+
       <div class="welcome-actions">
-        <button id="welcome-start" class="btn-primary">Iniciar</button>
-        <button id="welcome-continue" class="btn-ghost">Continuar progresso salvo</button>
+        <button id="welcome-start" class="btn-primary" type="button">Iniciar</button>
+        <button id="welcome-continue" class="btn-ghost" type="button">Continuar progresso salvo</button>
       </div>
+
       <div class="welcome-footer">
         <label class="theme-switch">
-          <input type="checkbox" id="theme-toggle" />
+          <input type="checkbox" id="theme-toggle" aria-label="Alternar tema" />
           <span>Modo claro</span>
         </label>
       </div>
     </div>
   </div>
 
-  <main class="container">
+  <main class="container" id="app">
     <header class="site-header">
       <div class="brand">
-        <img src="logo-optimized.png" alt="Legado Escolar" class="brand-logo"/>
+        <picture>
+          <source srcset="assets/images/logo-optimized.webp" type="image/webp">
+          <img src="assets/images/logo-optimized-512.png" alt="Legado Escolar" class="brand-logo"/>
+        </picture>
         <div>
           <div class="brand-title">LEGADO ESCOLAR</div>
           <div class="brand-sub">Quiz PM · PC</div>
@@ -45,8 +54,9 @@
 
       <div class="header-controls">
         <div id="save-status" class="save-status">Nenhum progresso salvo</div>
+
         <label class="theme-switch-inline">
-          <input type="checkbox" id="theme-toggle-inline" />
+          <input type="checkbox" id="theme-toggle-inline" aria-label="Alternar tema" />
           <span>Modo claro</span>
         </label>
       </div>
@@ -68,38 +78,38 @@
           <option>Guardiões</option>
           <option>Solidários</option>
         </select>
-        <button id="start-btn" class="btn-primary">Iniciar Quiz</button>
+        <button id="start-btn" class="btn-primary" type="button">Iniciar Quiz</button>
       </form>
     </section>
 
-    <section id="quiz-area" class="card hidden">
+    <section id="quiz-area" class="card hidden" aria-live="polite">
       <div id="question-container"></div>
 
       <div class="controls">
-        <button id="prev-btn" class="btn-ghost">Anterior</button>
+        <button id="prev-btn" class="btn-ghost" type="button">Anterior</button>
 
         <div class="pager">
           <span id="question-index"></span>
           <span id="pm-score">PM: 0</span>
         </div>
 
-        <button id="next-btn" class="btn-ghost">Próxima</button>
+        <button id="next-btn" class="btn-ghost" type="button">Próxima</button>
       </div>
 
       <div class="submit-row">
-        <button id="submit-btn" class="btn-primary">Enviar Resposta</button>
+        <button id="submit-btn" class="btn-primary" type="button">Enviar Resposta</button>
       </div>
 
       <div id="loader" class="loader hidden" aria-hidden="true">
-        <div class="spinner"></div>
+        <div class="spinner" aria-hidden="true"></div>
       </div>
     </section>
 
-    <section id="results" class="card hidden">
+    <section id="results" class="card hidden" aria-live="polite">
       <h2>Resultados</h2>
       <div id="result-detail"></div>
       <div class="results-actions">
-        <button id="restart-btn" class="btn-ghost">Reiniciar</button>
+        <button id="restart-btn" class="btn-ghost" type="button">Reiniciar</button>
       </div>
     </section>
 
@@ -108,6 +118,7 @@
     </footer>
   </main>
 
+  <!-- script: certifique-se que app.js esteja no mesmo diretório ou ajuste o caminho -->
   <script type="module" src="app.js"></script>
 </body>
-        </html>
+</html>

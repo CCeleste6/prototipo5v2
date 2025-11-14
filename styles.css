@@ -14,7 +14,7 @@
   --ff-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
-/* Reset */
+
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
 body{
@@ -27,20 +27,20 @@ body{
   padding:24px 12px;
 }
 
-/* Light theme */
+
 body.theme-light{
   background:var(--bg-soft-light);
   color:var(--text-dark);
 }
 
-/* Container */
+
 .container{
   max-width:1100px;
   margin:0 auto;
   padding:18px;
 }
 
-/* Header / brand */
+
 .site-header{
   display:flex;
   justify-content:space-between;
@@ -77,7 +77,7 @@ body.theme-light .brand-title{ color:var(--text-dark); }
 }
 body.theme-light .brand-sub{ color:#6b7280; }
 
-/* Top panel houses */
+
 .top-panel{display:flex;flex-direction:column;gap:14px}
 .houses{display:flex;gap:12px;flex-wrap:wrap}
 .house{
@@ -93,7 +93,7 @@ body.theme-light .house{ background:#fff; border:1px solid rgba(0,0,0,0.06); box
 body.theme-light .house strong{ color:var(--text-dark) }
 .house .pc{margin-top:6px;color:var(--accent);font-weight:700}
 
-/* Participant form */
+
 .participant-form{
   display:flex;
   gap:10px;
@@ -117,7 +117,7 @@ body.theme-light .participant-form select{
 .participant-form input::placeholder{color:rgba(255,255,255,0.6)}
 body.theme-light .participant-form input::placeholder{ color:#94a3b8 }
 
-/* Cards */
+
 .card{
   margin-top:16px;
   background:rgba(255,255,255,0.98);
@@ -128,7 +128,7 @@ body.theme-light .participant-form input::placeholder{ color:#94a3b8 }
   border:1px solid rgba(0,0,0,0.06);
 }
 
-/* Question area */
+
 #question-container h3{
   font-family:var(--ff-heading);
   color:var(--accent-700);
@@ -147,19 +147,19 @@ body.theme-light .participant-form input::placeholder{ color:#94a3b8 }
 .alt:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(2,8,23,0.06)}
 .alt.selected{outline:3px solid rgba(210,160,120,0.22);background:linear-gradient(90deg,#fff7ed,#fffefc)}
 
-/* Highlight for advantages of player's house */
+
 .alt.house-adv{
   border:2px dashed rgba(210,160,120,0.35);
   background:linear-gradient(90deg, rgba(212,176,139,0.05), rgba(255,255,255,0.02));
   box-shadow:0 6px 18px rgba(178,138,99,0.06);
 }
 
-/* Controls */
+
 .controls{display:flex;align-items:center;justify-content:space-between;margin-top:18px;gap:10px}
 .controls .pager{display:flex;gap:12px;align-items:center;font-weight:700}
 .submit-row{display:flex;justify-content:center;margin-top:14px}
 
-/* Buttons */
+
 .btn-primary{
   background:linear-gradient(180deg,var(--accent),var(--accent-700));
   color:#07202a;padding:10px 16px;border-radius:10px;border:none;font-weight:700;cursor:pointer;
@@ -172,7 +172,7 @@ body.theme-light .participant-form input::placeholder{ color:#94a3b8 }
 body.theme-light .btn-ghost{ color:var(--text-dark); border:1px solid rgba(0,0,0,0.06) }
 .btn-ghost:hover{background:rgba(255,255,255,0.03)}
 
-/* Loader */
+
 .loader{display:flex;justify-content:center;margin-top:12px}
 .loader .spinner{
   width:48px;height:48px;border-radius:50%;
@@ -182,15 +182,15 @@ body.theme-light .btn-ghost{ color:var(--text-dark); border:1px solid rgba(0,0,0
 }
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* Results */
+
 #results h2{font-family:var(--ff-heading);color:var(--accent);text-align:center;margin-bottom:12px}
 .result-row{background:#fff;border-radius:10px;padding:12px;margin-bottom:12px;border:1px solid rgba(0,0,0,0.04)}
 
-/* Footer */
+
 .site-footer{margin-top:22px;text-align:center;color:rgba(255,255,255,0.5)}
 body.theme-light .site-footer{ color:#4b5563 }
 
-/* Welcome overlay */
+
 .overlay{
   position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
   background:linear-gradient(180deg,rgba(2,8,23,0.6),rgba(2,8,23,0.7));
@@ -212,7 +212,7 @@ body.theme-light .welcome-card .lead{ color:#334155 }
 .theme-switch, .theme-switch-inline{display:flex;align-items:center;gap:8px;cursor:pointer}
 .theme-switch input, .theme-switch-inline input{width:18px;height:18px}
 
-/* Responsive */
+
 @media (max-width:900px){
   .site-header{flex-direction:column;align-items:flex-start;gap:12px}
   .brand-logo{width:62px;height:62px}
@@ -225,4 +225,4 @@ body.theme-light .welcome-card .lead{ color:#334155 }
   .participant-form input, .participant-form select{width:100%}
   .houses{flex-direction:column;gap:8px}
   .welcome-card{padding:20px}
-  }
+}

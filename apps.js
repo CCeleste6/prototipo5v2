@@ -1,14 +1,8 @@
-// app.js — versão final com:
-// - otimização de tema e persistência,
-// - destaque de alternativas que ativam vantagens da casa do jogador,
-// - loader animado entre transições,
-// - otimização de logo (espera-se logo-optimized.png no repositório),
-// - export/import não incluídos (pedido anterior).
 
 const STORAGE_KEY = 'quiz-pm-pc:v1';
 const THEME_KEY = 'legado-theme:v1';
 
-/* ---------- Perguntas (mesmas usadas antes) ---------- */
+
 const QUESTIONS = {
   math: [
     {"id":"m1","tema":"Matemática","tipo":"Múltipla escolha","enunciado":"Calcule o valor de 3/4 de 48.","alternativas":["32","36","24","16"],"resposta":"36","pontos_PM":5,"gatilhos_PC":[{"tipo":"Marca Individual I","casa":"Precursores","pc":20}]},
@@ -41,32 +35,33 @@ let pmTotal = 0;
 let answers = {};
 let lastSavedAt = null;
 
-/* DOM */
+
+function $id(id){ return document.getElementById(id); }
 const el = {
-  welcome: document.getElementById('welcome'),
-  welcomeStart: document.getElementById('welcome-start'),
-  welcomeContinue: document.getElementById('welcome-continue'),
-  themeToggle: document.getElementById('theme-toggle'),
-  themeToggleInline: document.getElementById('theme-toggle-inline'),
-  startBtn: document.getElementById('start-btn'),
-  nameInput: document.getElementById('participant-name'),
-  houseSelect: document.getElementById('participant-house'),
-  quizArea: document.getElementById('quiz-area'),
-  questionContainer: document.getElementById('question-container'),
-  prevBtn: document.getElementById('prev-btn'),
-  nextBtn: document.getElementById('next-btn'),
-  submitBtn: document.getElementById('submit-btn'),
-  pmScore: document.getElementById('pm-score'),
-  qIndex: document.getElementById('question-index'),
-  results: document.getElementById('results'),
-  resultDetail: document.getElementById('result-detail'),
-  restartBtn: document.getElementById('restart-btn'),
-  houseScores: document.getElementById('house-scores'),
-  saveStatus: document.getElementById('save-status'),
-  loader: document.getElementById('loader')
+  welcome: $id('welcome'),
+  welcomeStart: $id('welcome-start'),
+  welcomeContinue: $id('welcome-continue'),
+  themeToggle: $id('theme-toggle'),
+  themeToggleInline: $id('theme-toggle-inline'),
+  startBtn: $id('start-btn'),
+  nameInput: $id('participant-name'),
+  houseSelect: $id('participant-house'),
+  quizArea: $id('quiz-area'),
+  questionContainer: $id('question-container'),
+  prevBtn: $id('prev-btn'),
+  nextBtn: $id('next-btn'),
+  submitBtn: $id('submit-btn'),
+  pmScore: $id('pm-score'),
+  qIndex: $id('question-index'),
+  results: $id('results'),
+  resultDetail: $id('result-detail'),
+  restartBtn: $id('restart-btn'),
+  houseScores: $id('house-scores'),
+  saveStatus: $id('save-status'),
+  loader: $id('loader')
 };
 
-/* Theming */
+
 function setTheme(isLight){
   if (isLight) document.body.classList.add('theme-light');
   else document.body.classList.remove('theme-light');
@@ -79,7 +74,7 @@ function setTheme(isLight){
   setTheme(t && t.light);
 } catch(e){ setTheme(false); } })();
 
-/* Persistence */
+
 function saveState(){
   const payload = { participant, idx, pmTotal, answers, houseState, savedAt: Date.now() };
   try {
@@ -87,7 +82,7 @@ function saveState(){
     lastSavedAt = payload.savedAt;
     updateSaveIndicator(lastSavedAt);
   } catch(e){
-    el.saveStatus.textContent = 'Não foi possível salvar localmente';
+    if (el.saveStatus) el.saveStatus.textContent = 'Não foi possível salvar localmente';
   }
 }
 
@@ -114,10 +109,11 @@ function loadState(){
 function clearState(){
   localStorage.removeItem(STORAGE_KEY);
   lastSavedAt = null;
-  updateSaveIndicator(null);
+  if (el.saveStatus) updateSaveIndicator(null);
 }
 
 function updateSaveIndicator(ts){
+  if (!el.saveStatus) return;
   if (!ts) {
     el.saveStatus.textContent = 'Nenhum progresso salvo';
     return;
@@ -126,9 +122,10 @@ function updateSaveIndicator(ts){
   el.saveStatus.textContent = `Progresso salvo em ${d.toLocaleString('pt-BR')}`;
 }
 
-/* UI helpers */
+
 function renderHouseScores(){
-  document.querySelectorAll('.house').forEach(div=>{
+  const houses = document.querySelectorAll('.house');
+  houses.forEach(div=>{
     const name = div.dataset.house;
     const pcEl = div.querySelector('.pc');
     if (pcEl) pcEl.textContent = `PC: ${houseState[name].pc}`;
@@ -136,13 +133,13 @@ function renderHouseScores(){
 }
 
 function showLoader(on = true){
-  const loader = document.getElementById('loader');
-  if (!loader) return;
-  if (on) loader.classList.remove('hidden'); else loader.classList.add('hidden');
+  if (!el.loader) return;
+  if (on) el.loader.classList.remove('hidden'); else el.loader.classList.add('hidden');
 }
 
-/* Core question rendering with visual highlight for advantages */
+
 function renderQuestion(){
+  if (!el.questionContainer) return;
   const q = allQuestions[idx];
   el.questionContainer.innerHTML = '';
   const title = document.createElement('h3');
@@ -156,9 +153,7 @@ function renderQuestion(){
     const list = document.createElement('div'); list.className='alternatives';
     q.alternativas.forEach(alt=>{
       const b = document.createElement('div'); b.className='alt'; b.textContent=alt; b.dataset.value=alt;
-      // if this question contains gatilhos that target participant's house, mark for visual cue
       const containsAdv = Array.isArray(q.gatilhos_PC) && q.gatilhos_PC.some(g => {
-        // if no participant chosen yet, don't highlight; else highlight only if g.casa matches participant.house or g.casa is undefined (treated as apply to participant)
         return participant && (String(g.casa || participant.house) === String(participant.house));
       });
       if (containsAdv) b.classList.add('house-adv');
@@ -175,12 +170,12 @@ function renderQuestion(){
   }
 }
 
-/* Status and answer handling */
+
 function updateStatus(){
-  document.getElementById('pm-score').textContent = `PM: ${pmTotal}`;
-  document.getElementById('question-index').textContent = `Questão ${idx+1} / ${allQuestions.length}`;
-  el.prevBtn.disabled = idx === 0;
-  el.nextBtn.disabled = idx === allQuestions.length - 1;
+  if ($id('pm-score')) $id('pm-score').textContent = `PM: ${pmTotal}`;
+  if ($id('question-index')) $id('question-index').textContent = `Questão ${idx+1} / ${allQuestions.length}`;
+  if (el.prevBtn) el.prevBtn.disabled = idx === 0;
+  if (el.nextBtn) el.nextBtn.disabled = idx === allQuestions.length - 1;
 }
 
 function getCurrentAnswer(){
@@ -189,7 +184,7 @@ function getCurrentAnswer(){
     const sel = document.querySelector('.alt.selected');
     return sel ? sel.dataset.value : '';
   } else {
-    const ta = document.getElementById('open-answer');
+    const ta = $id('open-answer');
     return ta ? ta.value.trim() : '';
   }
 }
@@ -210,7 +205,7 @@ function collectGatilhos(question, answer){
   return collected;
 }
 
-/* Apply only advantages of participant's house at the end */
+
 function applyGatilhosFinal(){
   if (!participant || !participant.house) return [];
   const applied = [];
@@ -228,48 +223,44 @@ function applyGatilhosFinal(){
   return applied;
 }
 
-/* Flow control */
+
 function startQuizFromForm(){
-  const name = el.nameInput.value.trim() || 'Aluno';
-  const house = el.houseSelect.value;
+  const name = (el.nameInput && el.nameInput.value.trim()) || 'Aluno';
+  const house = (el.houseSelect && el.houseSelect.value) || 'Precursores';
   participant = { id: Date.now().toString(), name, house };
   pmTotal = 0; idx = 0; answers = {};
   saveState();
-  el.quizArea.classList.remove('hidden');
-  el.results.classList.add('hidden');
-  // small animated transition
+  if (el.quizArea) el.quizArea.classList.remove('hidden');
+  if (el.results) el.results.classList.add('hidden');
   showLoader(true);
   setTimeout(()=>{ showLoader(false); renderQuestion(); updateStatus(); renderHouseScores(); }, 450);
 }
 
 function restoreToUI(){
   if (!participant) return;
-  el.nameInput.value = participant.name || '';
-  for (let i=0;i<el.houseSelect.options.length;i++){
-    if (el.houseSelect.options[i].value === participant.house){ el.houseSelect.selectedIndex = i; break; }
+  if (el.nameInput) el.nameInput.value = participant.name || '';
+  if (el.houseSelect) {
+    for (let i=0;i<el.houseSelect.options.length;i++){
+      if (el.houseSelect.options[i].value === participant.house){ el.houseSelect.selectedIndex = i; break; }
+    }
   }
-  el.quizArea.classList.remove('hidden');
-  el.results.classList.add('hidden');
+  if (el.quizArea) el.quizArea.classList.remove('hidden');
+  if (el.results) el.results.classList.add('hidden');
   renderQuestion(); updateStatus(); renderHouseScores();
   updateSaveIndicator(lastSavedAt);
 }
 
-/* Events */
-el.welcomeStart.addEventListener('click', ()=>{ el.welcome.classList.add('hidden'); });
-el.welcomeContinue.addEventListener('click', ()=>{
-  const ok = loadState();
-  if (ok) { el.welcome.classList.add('hidden'); restoreToUI(); } else { alert('Nenhum progresso salvo encontrado.'); }
-});
+
+if (el.welcomeStart) el.welcomeStart.addEventListener('click', ()=>{ if (el.welcome) el.welcome.classList.add('hidden'); });
+if (el.welcomeContinue) el.welcomeContinue.addEventListener('click', ()=>{ const ok = loadState(); if (ok) { if (el.welcome) el.welcome.classList.add('hidden'); restoreToUI(); } else { alert('Nenhum progresso salvo encontrado.'); } });
 
 if (el.themeToggle) el.themeToggle.addEventListener('change',(e)=>setTheme(e.target.checked));
 if (el.themeToggleInline) el.themeToggleInline.addEventListener('change',(e)=>setTheme(e.target.checked));
 
-el.startBtn.addEventListener('click', startQuizFromForm);
-
-el.prevBtn.addEventListener('click', ()=>{ if (idx>0){ idx--; renderQuestion(); updateStatus(); saveState(); }});
-el.nextBtn.addEventListener('click', ()=>{ if (idx<allQuestions.length-1){ idx++; renderQuestion(); updateStatus(); saveState(); }});
-
-el.submitBtn.addEventListener('click', ()=>{
+if (el.startBtn) el.startBtn.addEventListener('click', startQuizFromForm);
+if (el.prevBtn) el.prevBtn.addEventListener('click', ()=>{ if (idx>0){ idx--; renderQuestion(); updateStatus(); saveState(); }});
+if (el.nextBtn) el.nextBtn.addEventListener('click', ()=>{ if (idx<allQuestions.length-1){ idx++; renderQuestion(); updateStatus(); saveState(); }});
+if (el.submitBtn) el.submitBtn.addEventListener('click', ()=>{ 
   const q = allQuestions[idx];
   const answer = getCurrentAnswer();
   if (!answer) { alert('Responda a questão antes de enviar.'); return; }
@@ -283,69 +274,68 @@ el.submitBtn.addEventListener('click', ()=>{
   else { showResults(); }
 });
 
-/* Final results: apply final advantages + 10% PM -> PC */
 function showResults(){
   const appliedGatilhos = applyGatilhosFinal();
   const bonusPC = Math.floor((pmTotal * 10) / 100);
   if (participant && participant.house && bonusPC > 0) houseState[participant.house].pc += bonusPC;
 
-  el.quizArea.classList.add('hidden');
-  el.results.classList.remove('hidden');
-  el.resultDetail.innerHTML = '';
+  if (el.quizArea) el.quizArea.classList.add('hidden');
+  if (el.results) el.results.classList.remove('hidden');
+  if (el.resultDetail) el.resultDetail.innerHTML = '';
 
-  const summary = document.createElement('div'); summary.className='result-row';
-  summary.innerHTML = `<strong>${participant.name}</strong> — Casa: ${participant.house} — <span>PM total: ${pmTotal}</span>`;
-  el.resultDetail.appendChild(summary);
+  if (el.resultDetail) {
+    const summary = document.createElement('div'); summary.className='result-row';
+    summary.innerHTML = `<strong>${participant.name}</strong> — Casa: ${participant.house} — <span>PM total: ${pmTotal}</span>`;
+    el.resultDetail.appendChild(summary);
 
-  const gRow = document.createElement('div'); gRow.className='result-row';
-  if (appliedGatilhos.length>0){
-    gRow.innerHTML = `<strong>Vantagens aplicadas da casa ${participant.house}:</strong>`;
-    appliedGatilhos.forEach(g=>{ const d=document.createElement('div'); d.textContent=`+${g.pc} PC — ${g.motivo}`; gRow.appendChild(d); });
-  } else { gRow.textContent = `Nenhuma vantagem da casa ${participant.house} foi ativada.`; }
-  el.resultDetail.appendChild(gRow);
+    const gRow = document.createElement('div'); gRow.className='result-row';
+    if (appliedGatilhos.length>0){
+      gRow.innerHTML = `<strong>Vantagens aplicadas da casa ${participant.house}:</strong>`;
+      appliedGatilhos.forEach(g=>{ const d=document.createElement('div'); d.textContent=`+${g.pc} PC — ${g.motivo}`; gRow.appendChild(d); });
+    } else { gRow.textContent = `Nenhuma vantagem da casa ${participant.house} foi ativada.`; }
+    el.resultDetail.appendChild(gRow);
 
-  const bonusRow = document.createElement('div'); bonusRow.className='result-row';
-  bonusRow.innerHTML = `Bônus: 10% do PM convertido em PC = <strong>+${bonusPC} PC</strong> para a casa <strong>${participant.house}</strong>`;
-  el.resultDetail.appendChild(bonusRow);
+    const bonusRow = document.createElement('div'); bonusRow.className='result-row';
+    bonusRow.innerHTML = `Bônus: 10% do PM convertido em PC = <strong>+${bonusPC} PC</strong> para a casa <strong>${participant.house}</strong>`;
+    el.resultDetail.appendChild(bonusRow);
 
-  Object.keys(answers).forEach((qid,i)=>{
-    const a = answers[qid];
-    const row = document.createElement('div'); row.className='result-row';
-    row.innerHTML = `<div><strong>Questão ${i+1}</strong> — correta: ${a.correct} — PM ganho: ${a.pmEarned}</div>`;
-    if (a.gatilhos && a.gatilhos.length){
-      a.gatilhos.forEach(g=>{
-        const gdiv=document.createElement('div'); const target = g.casa || participant.house;
-        gdiv.textContent = `Gatilho registrado: ${g.tipo} => +${g.pc} PC para ${target}`;
-        row.appendChild(gdiv);
-      });
-    }
-    el.resultDetail.appendChild(row);
-  });
+    Object.keys(answers).forEach((qid,i)=>{
+      const a = answers[qid];
+      const row = document.createElement('div'); row.className='result-row';
+      row.innerHTML = `<div><strong>Questão ${i+1}</strong> — correta: ${a.correct} — PM ganho: ${a.pmEarned}</div>`;
+      if (a.gatilhos && a.gatilhos.length){
+        a.gatilhos.forEach(g=>{
+          const gdiv=document.createElement('div'); const target = g.casa || participant.house;
+          gdiv.textContent = `Gatilho registrado: ${g.tipo} => +${g.pc} PC para ${target}`;
+          row.appendChild(gdiv);
+        });
+      }
+      el.resultDetail.appendChild(row);
+    });
 
-  const housesRow = document.createElement('div'); housesRow.className='result-row';
-  housesRow.innerHTML = `<h3>Placar de Casas</h3>`;
-  Object.keys(houseState).forEach(h=>{ const d=document.createElement('div'); d.textContent=`${h}: PC = ${houseState[h].pc}`; housesRow.appendChild(d); });
-  el.resultDetail.appendChild(housesRow);
+    const housesRow = document.createElement('div'); housesRow.className='result-row';
+    housesRow.innerHTML = `<h3>Placar de Casas</h3>`;
+    Object.keys(houseState).forEach(h=>{ const d=document.createElement('div'); d.textContent=`${h}: PC = ${houseState[h].pc}`; housesRow.appendChild(d); });
+    el.resultDetail.appendChild(housesRow);
+  }
 
   saveState();
 }
 
-el.restartBtn.addEventListener('click', ()=>{
+if (el.restartBtn) el.restartBtn.addEventListener('click', ()=>{ 
   if (!confirm('Reiniciar quiz local? Isso apagará progresso salvo neste navegador.')) return;
   participant = null; idx = 0; pmTotal = 0; answers = {};
   Object.keys(houseState).forEach(h=>houseState[h].pc=0);
   clearState(); renderHouseScores();
-  el.results.classList.add('hidden'); el.quizArea.classList.add('hidden'); el.nameInput.value='';
+  if (el.results) el.results.classList.add('hidden'); if (el.quizArea) el.quizArea.classList.add('hidden'); if (el.nameInput) el.nameInput.value='';
 });
 
-/* Init on load */
+
 window.addEventListener('load', ()=>{
   renderHouseScores();
   const ok = loadState();
   if (ok) {
-    // Keep welcome visible so user decides to continue or start fresh
-    // Pre-fill participant fields if available
-    document.getElementById('participant-name').value = participant?.name || '';
+    if (el.nameInput) el.nameInput.value = participant?.name || '';
     updateSaveIndicator(lastSavedAt);
   } else {
     updateSaveIndicator(null);

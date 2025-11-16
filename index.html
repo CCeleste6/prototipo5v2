@@ -3,115 +3,81 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Legado Escolar — Quiz PM / PC</title>
+  <title>Legado Escolar · Quiz PM / PC</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="icon" href="logo-optimized.jpeg" />
-  <link rel="stylesheet" href="styles.css" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
-  <div id="welcome" class="overlay hidden" aria-hidden="true">
-    <div class="welcome-card" role="dialog" aria-labelledby="welcome-title" aria-modal="true">
-      <picture>
-        <img src="logo-optimized.jpeg" alt="Legado Escolar" class="welcome-logo" />
-      </picture>
-
-      <h1 id="welcome-title">LEGADO ESCOLAR</h1>
-      <p class="lead">Bem-vindo ao Quiz de PM e PC. Ganhe Pontos de Mérito (PM) e contribua com Pontos de Casa (PC) para sua casa.</p>
-
-      <div class="welcome-actions">
-        <button id="welcome-start" class="btn-primary" type="button">Iniciar</button>
-        <button id="welcome-continue" class="btn-ghost" type="button">Continuar progresso salvo</button>
-      </div>
-
-      <div class="welcome-footer">
-        <label class="theme-switch">
-          <input type="checkbox" id="theme-toggle" aria-label="Alternar tema" />
-          <span id="theme-toggle-label">Modo claro</span>
-        </label>
+  <header class="topbar">
+    <div class="brand">
+      <img src="https://cceleste6.github.io/prototipo5v2/logo-optimized.jpeg" alt="Legado Escolar" class="logo">
+      <div class="title">
+        <h1>LEGADO ESCOLAR</h1>
+        <p class="tag">Quiz PM · PC</p>
       </div>
     </div>
-  </div>
 
-  <main class="container" id="app">
-    <header class="site-header">
-      <div class="brand">
-        <picture>
-          <img src="logo-optimized.jpeg" alt="Legado Escolar" class="brand-logo"/>
-        </picture>
-        <div>
-          <div class="brand-title">LEGADO ESCOLAR</div>
-          <div class="brand-sub">Quiz PM · PC</div>
+    <div class="controls">
+      <button id="toggle-theme" class="btn icon">🌙</button>
+      <button id="save-progress" class="btn">Salvar</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <aside class="scoreboard">
+      <h2>Casas</h2>
+      <ul class="houses">
+        <li><strong>Precursores</strong> <span class="pc" id="pc-precursores">0</span></li>
+        <li><strong>Visionários</strong> <span class="pc" id="pc-visionarios">0</span></li>
+        <li><strong>Guardiões</strong> <span class="pc" id="pc-guardioes">0</span></li>
+        <li><strong>Solidários</strong> <span class="pc" id="pc-solidarios">0</span></li>
+      </ul>
+
+      <div class="summary">
+        <p><strong>PM total:</strong> <span id="pm-total">0</span></p>
+        <p class="progress-msg" id="progress-msg">Nenhum progresso salvo</p>
+      </div>
+    </aside>
+
+    <section class="quiz-area">
+      <div class="card">
+        <div class="question-header">
+          <span id="q-index">1</span> / <span id="q-total">1</span>
+        </div>
+
+        <div class="question" id="question-text">
+          Carregando pergunta...
+        </div>
+
+        <ul class="answers" id="answers-list">
+          <!-- Radio buttons gerados via JS -->
+        </ul>
+
+        <div class="quiz-actions">
+          <button id="prev-btn" class="btn">Anterior</button>
+          <button id="next-btn" class="btn primary">Próxima</button>
+          <button id="submit-btn" class="btn success">Enviar Resposta</button>
         </div>
       </div>
 
-      <div class="header-controls">
-        <div id="save-status" class="save-status">Nenhum progresso salvo</div>
-
-        <label class="theme-switch-inline">
-          <input type="checkbox" id="theme-toggle-inline" aria-label="Alternar tema" />
-          <span id="theme-toggle-inline-label">Modo claro</span>
-        </label>
-      </div>
-    </header>
-
-    <section class="top-panel">
-      <div class="houses" id="house-scores">
-        <div class="house" data-house="Precursores"><strong>Precursores</strong><div class="pc">PC: 0</div></div>
-        <div class="house" data-house="Visionários"><strong>Visionários</strong><div class="pc">PC: 0</div></div>
-        <div class="house" data-house="Guardiões"><strong>Guardiões</strong><div class="pc">PC: 0</div></div>
-        <div class="house" data-house="Solidários"><strong>Solidários</strong><div class="pc">PC: 0</div></div>
-      </div>
-
-      <form id="participant-form" class="participant-form" onsubmit="return false;">
-        <input id="participant-name" placeholder="Seu nome" aria-label="Seu nome" />
-        <select id="participant-house" aria-label="Selecione sua casa">
-          <option>Precursores</option>
-          <option>Visionários</option>
-          <option>Guardiões</option>
-          <option>Solidários</option>
-        </select>
-        <button id="start-btn" class="btn-primary" type="button">Iniciar Quiz</button>
-      </form>
-    </section>
-
-    <section id="quiz-area" class="card hidden" aria-live="polite">
-      <div id="question-container"></div>
-
-      <div class="controls">
-        <button id="prev-btn" class="btn-ghost" type="button">Anterior</button>
-
-        <div class="pager">
-          <span id="question-index"></span>
-          <span id="pm-score">PM: 0</span>
+      <div class="result-card" id="result-card" hidden>
+        <h3>Resultados</h3>
+        <div id="result-body"></div>
+        <div class="result-actions">
+          <button id="restart-btn" class="btn warning">Reiniciar</button>
         </div>
-
-        <button id="next-btn" class="btn-ghost" type="button">Próxima</button>
-      </div>
-
-      <div class="submit-row">
-        <button id="submit-btn" class="btn-primary" type="button">Enviar Resposta</button>
-      </div>
-
-      <div id="loader" class="loader hidden" aria-hidden="true">
-        <div class="spinner" aria-hidden="true"></div>
       </div>
     </section>
-
-    <section id="results" class="card hidden" aria-live="polite">
-      <h2>Resultados</h2>
-      <div id="result-detail"></div>
-      <div class="results-actions">
-        <button id="restart-btn" class="btn-ghost" type="button">Reiniciar</button>
-      </div>
-    </section>
-
-    <footer class="site-footer">
-      <small>Legado Escolar · Sistema de pontuação educacional</small>
-    </footer>
   </main>
 
-  <script type="module" src="apps.js"></script>
+  <footer class="footer">
+    <p>Legado Escolar · Sistema de pontuação educacional</p>
+  </footer>
+
+  <script src="apps.js"></script>
 </body>
 </html>

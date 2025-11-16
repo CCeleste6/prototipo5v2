@@ -403,3 +403,49 @@ body {
   background: rgba(255,255,255,0.2);
   color: white;
 }
+
+/* ===== INVENTÁRIO ===== */
+.inventory-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 50%;
+  transform: translateX(50%);
+  padding: 12px 22px;
+  border-radius: 10px;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: 0.2s;
+}
+
+.inventory-toggle:hover {
+  opacity: 1;
+}
+
+.inventory-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 450px;
+  transform: translate(-50%, -50%);
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(16px);
+  border-radius: 16px;
+  padding: 20px;
+  border: 2px solid rgba(255,255,255,0.2);
+  color: white;
+  box-shadow: 0 0 25px rgba(0,0,0,0.6);
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+#inventory-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#inventory-list li {
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  font-size: 15px;
+}

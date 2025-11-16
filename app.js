@@ -184,3 +184,52 @@ window.onload = () => {
 };
 
 document.getElementById("finish-btn").addEventListener("click", finalizarAtividade);
+
+/*******************************
+ * MODO MESTRE
+ ******************************/
+const masterBtn = document.getElementById("master-btn");
+const masterPanel = document.getElementById("master-panel");
+const closeMaster = document.getElementById("close-master");
+const exportBtn = document.getElementById("export-btn");
+const resetBtn = document.getElementById("reset-btn");
+const masterOutput = document.getElementById("master-output");
+
+masterBtn.addEventListener("click", () => {
+  masterPanel.classList.toggle("hidden");
+  renderMasterData();
+});
+
+closeMaster.addEventListener("click", () => {
+  masterPanel.classList.add("hidden");
+});
+
+resetBtn.addEventListener("click", () => {
+  if (confirm("Tem certeza que quer apagar tudo?")) {
+    localStorage.clear();
+    alert("Dados resetados!");
+    location.reload();
+  }
+});
+
+exportBtn.addEventListener("click", exportCSV);
+
+function renderMasterData() {
+  masterOutput.textContent = JSON.stringify(localStorage, null, 2);
+}
+
+function exportCSV() {
+  let csv = "key,value\n";
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    csv += `${key},"${localStorage.getItem(key)}"\n`;
+  }
+
+  const blob = new Blob([csv], {type: "text/csv"});
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "legado_dados.csv";
+  a.click();
+}

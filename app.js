@@ -319,3 +319,101 @@ function renderRankings() {
     <li><b>${i+1}º</b> — ${c[0]} — <b>${c[1]} pts</b></li>
   `).join("");
 }
+
+/******************************
+ * SISTEMA DE CONQUISTAS
+ *****************************/
+const ACHIEVEMENTS_DATA = [
+  {
+    id: "first_activity",
+    name: "Primeiro Passo",
+    desc: "Concluiu sua primeira atividade",
+    condition: () => totalActivities() >= 1
+  },
+  {
+    id: "first_advantage",
+    name: "Aproveitou a Chance",
+    desc: "Usou uma vantagem pela primeira vez",
+    condition: () => Number(localStorage.getItem("vantagens_usadas")) >= 1
+  },
+  {
+    id: "xp_100",
+    name: "Ascendente",
+    desc: "Conquistou 100 XP totais",
+    condition: () => xp >= 100
+  },
+  {
+    id: "xp_500",
+    name: "Veterano",
+    desc: "Passou da marca de 500 XP",
+    condition: () => xp >= 500
+  },
+  {
+    id: "rank_5",
+    name: "Nobre da Aprendizagem",
+    desc: "Alcançou o Ranque 5",
+    condition: () => currentRank >= 5
+  },
+  {
+    id: "house_loyalty",
+    name: "Fiel à Casa",
+    desc: "Participou de 10 atividades na mesma casa",
+    condition: () => Number(localStorage.getItem("atividades_na_casa")) >= 10
+  }
+];
+
+
+const achievementsBtn = document.getElementById("achievements-btn");
+const achievementsPanel = document.getElementById("achievements-panel");
+const closeAchievements = document.getElementById("close-achievements");
+const achievementsList = document.getElementById("achievements-list");
+
+achievementsBtn.addEventListener("click", () => {
+  achievementsPanel.classList.toggle("hidden");
+  renderAchievements();
+});
+
+closeAchievements.addEventListener("click", () => {
+  achievementsPanel.classList.add("hidden");
+});
+
+function renderAchievements() {
+  const unlocked = JSON.parse(localStorage.getItem("achievements") || "{}");
+
+  achievementsList.innerHTML = ACHIEVEMENTS_DATA.map(a => {
+    const isUnlocked = unlocked[a.id];
+
+    return `
+      <li class="${isUnlocked ? "badge-unlocked" : "badge-locked"}">
+        🏅 ${a.name}
+        <br><small>${a.desc}</small>
+      </li>
+    `;
+  }).join("");
+}
+
+function tryUnlockAchievements() {
+  const unlocked = JSON.parse(localStorage.getItem("achievements") || "{}");
+  let changed = false;
+
+  ACHIEVEMENTS_DATA.forEach(a => {
+    if (!unlocked[a.id] && a.condition()) {
+      unlocked[a.id] = true;
+      changed = true;
+      showAchievementToast(a.name);
+    }
+  });
+
+  if (changed) {
+    localStorage.setItem("achievements", JSON.stringify(unlocked));
+  }
+}
+
+function showAchievementToast(name) {
+  alert(`🏅 Nova conquista desbloqueada:\n${name}`);
+}
+
+
+function totalActivities() {
+  return Number(localStorage.getItem("atividades_completas") || 0);
+}

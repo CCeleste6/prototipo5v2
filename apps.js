@@ -1,7 +1,6 @@
-
 const STORAGE_KEY = 'quiz-pm-pc:v1';
 const THEME_KEY = 'legado-theme:v1';
-
+const WELCOME_KEY = 'legado-welcome-seen:v1';
 
 const QUESTIONS = {
   math: [
@@ -35,12 +34,12 @@ let pmTotal = 0;
 let answers = {};
 let lastSavedAt = null;
 
-
 function $id(id){ return document.getElementById(id); }
 const el = {
   welcome: $id('welcome'),
   welcomeStart: $id('welcome-start'),
   welcomeContinue: $id('welcome-continue'),
+  welcomeCard: document.querySelector('.welcome-card'),
   themeToggle: $id('theme-toggle'),
   themeToggleInline: $id('theme-toggle-inline'),
   startBtn: $id('start-btn'),
@@ -62,17 +61,51 @@ const el = {
 };
 
 
-function setTheme(isLight){
-  if (isLight) document.body.classList.add('theme-light');
-  else document.body.classList.remove('theme-light');
-  try { localStorage.setItem(THEME_KEY, JSON.stringify({light: !!isLight})); } catch(e){}
+function applyThemeState(isLight){
+
+  if (isLight) {
+    document.body.classList.add('theme-light');
+    document.documentElement.classList.add('light');
+  } else {
+    document.body.classList.remove('theme-light');
+    document.documentElement.classList.remove('light');
+  }
+
   if (el.themeToggle) el.themeToggle.checked = !!isLight;
   if (el.themeToggleInline) el.themeToggleInline.checked = !!isLight;
+ 
+  try { localStorage.setItem(THEME_KEY, JSON.stringify({ light: !!isLight })); } catch(e){}
 }
-(function(){ try {
-  const t = JSON.parse(localStorage.getItem(THEME_KEY));
-  setTheme(t && t.light);
-} catch(e){ setTheme(false); } })();
+
+function initTheme(){
+  try {
+    const raw = localStorage.getItem(THEME_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      applyThemeState(!!(parsed && parsed.light));
+      return;
+    }
+  } catch(e){ /* ignore parse errors */ }
+
+  const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+  applyThemeState(prefersLight);
+}
+
+function attachThemeListeners(){
+  if (el.themeToggle) {
+    el.themeToggle.addEventListener('change', () => {
+      applyThemeState(el.themeToggle.checked);
+    });
+  }
+  if (el.themeToggleInline) {
+    el.themeToggleInline.addEventListener('change', () => {
+      applyThemeState(el.themeToggleInline.checked);
+    });
+  }
+  
+  window.Legado = window.Legado || {};
+  window.Legado.applyThemeState = applyThemeState;
+}
 
 
 function saveState(){
@@ -82,6 +115,7 @@ function saveState(){
     lastSavedAt = payload.savedAt;
     updateSaveIndicator(lastSavedAt);
   } catch(e){
+    console.warn('Erro ao salvar estado:', e);
     if (el.saveStatus) el.saveStatus.textContent = 'Não foi possível salvar localmente';
   }
 }
@@ -100,16 +134,19 @@ function loadState(){
         houseState[h].pc = (data.houseState && data.houseState[h] && Number(data.houseState[h].pc)) || houseState[h].pc;
       });
       lastSavedAt = data.savedAt || null;
+      updateSaveIndicator(lastSavedAt);
       return true;
     }
-  } catch(e){ console.warn('Erro ao carregar estado:', e); }
+  } catch(e){
+    console.warn('Erro ao carregar estado:', e);
+  }
   return false;
 }
 
 function clearState(){
   localStorage.removeItem(STORAGE_KEY);
   lastSavedAt = null;
-  if (el.saveStatus) updateSaveIndicator(null);
+  updateSaveIndicator(null);
 }
 
 function updateSaveIndicator(ts){
@@ -128,9 +165,10 @@ function renderHouseScores(){
   houses.forEach(div=>{
     const name = div.dataset.house;
     const pcEl = div.querySelector('.pc');
-    if (pcEl) pcEl.textContent = `PC: ${houseState[name].pc}`;
+    if (pcEl && houseState[name]) pcEl.textContent = `PC: ${houseState[name].pc}`;
   });
 }
+
 
 function showLoader(on = true){
   if (!el.loader) return;
@@ -152,5 +190,261 @@ function renderQuestion(){
   if (q.alternativas){
     const list = document.createElement('div'); list.className='alternatives';
     q.alternativas.forEach(alt=>{
-      const b = document.createElement('div'); b.className='alt'; b.textContent=alt; b.dataset.value=alt;
-      const containsAdv = Array
+      const b = document.createElement('div');
+      b.className='alt';
+      b.textContent = alt;
+      b.dataset.value = alt;
+      b.tabIndex = 0;
+     
+      b.addEventListener('click', () => {
+        
+        const prev = list.querySelector('.alt.selected');
+        if (prev) prev.classList.remove('selected');
+        b.classList.add('selected');
+        answers[q.id] = alt;
+      });
+      b.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          b.click();
+        }
+      });
+      list.appendChild(b);
+    });
+    el.questionContainer.appendChild(list);
+    
+    if (answers[q.id]) {
+      const chosen = Array.from(list.children).find(node => node.dataset.value === answers[q.id]);
+      if (chosen) chosen.classList.add('selected');
+    }
+  } else {
+    
+    const textarea = document.createElement('textarea');
+    textarea.id = `open-${q.id}`;
+    textarea.value = answers[q.id] || '';
+    textarea.addEventListener('input', () => {
+      answers[q.id] = textarea.value;
+    });
+    el.questionContainer.appendChild(textarea);
+  }
+
+  
+  if (el.qIndex) el.qIndex.textContent = `${idx + 1} / ${allQuestions.length}`;
+  if (el.pmScore) el.pmScore.textContent = `PM: ${pmTotal}`;
+}
+
+function goNext(){
+  if (idx < allQuestions.length - 1) {
+    idx++;
+    renderQuestion();
+  }
+}
+function goPrev(){
+  if (idx > 0) {
+    idx--;
+    renderQuestion();
+  }
+}
+
+
+function submitAnswer(){
+  const q = allQuestions[idx];
+  const given = answers[q.id];
+  let correct = false;
+  if (q.tipo && q.tipo.toLowerCase().includes('múltipla escolha')) {
+    correct = String(given) === String(q.resposta);
+  } else {
+    
+    correct = String(given || '').trim().toLowerCase() === String(q.resposta || '').trim().toLowerCase();
+  }
+  if (correct) {
+    pmTotal += Number(q.pontos_PM || 0);
+
+    if (Array.isArray(q.gatilhos_PC)) {
+      q.gatilhos_PC.forEach(g => {
+        if (houseState[g.casa]) houseState[g.casa].pc += Number(g.pc || 0);
+      });
+    }
+  }
+
+  if (idx < allQuestions.length - 1) {
+    idx++;
+    renderQuestion();
+  } else {
+    showResults();
+  }
+  saveState();
+  renderHouseScores();
+}
+
+function showResults(){
+  if (!el.results || !el.resultDetail) return;
+  el.quizArea.classList.add('hidden');
+  el.results.classList.remove('hidden');
+  el.resultDetail.innerHTML = `<p>Participante: ${participant || '—'}</p>
+    <p>PM total: ${pmTotal}</p>
+    <p>PC por casa:</p>
+    <ul>
+      ${Object.keys(houseState).map(h => `<li>${h}: ${houseState[h].pc} PC</li>`).join('')}
+    </ul>`;
+}
+
+function restartQuiz(){
+  participant = null; idx = 0; pmTotal = 0; answers = {};
+  Object.keys(houseState).forEach(h => houseState[h].pc = 0);
+  clearState();
+  // reset UI
+  if (el.nameInput) el.nameInput.value = '';
+  if (el.houseSelect) el.houseSelect.selectedIndex = 0;
+  if (el.results) el.results.classList.add('hidden');
+  if (el.quizArea) el.quizArea.classList.add('hidden');
+  renderHouseScores();
+}
+
+
+function isWelcomeSeen(){ return localStorage.getItem(WELCOME_KEY) === '1'; }
+function markWelcomeSeen(){ try { localStorage.setItem(WELCOME_KEY, '1'); } catch(e){} }
+
+function openWelcome(){
+  if (!el.welcome) return;
+  el.welcome.classList.remove('hidden');
+  el.welcome.setAttribute('aria-hidden', 'false');
+
+  document.body.style.overflow = 'hidden';
+
+  if (el.welcomeStart) el.welcomeStart.focus();
+}
+
+function closeWelcome(){
+  if (!el.welcome) return;
+  el.welcome.classList.add('hidden');
+  el.welcome.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+  markWelcomeSeen();
+
+  if (el.startBtn) el.startBtn.focus();
+}
+
+function onOverlayClick(e){
+
+  if (!el.welcomeCard) return;
+  if (!el.welcomeCard.contains(e.target)) {
+    closeWelcome();
+  }
+}
+
+function onEsc(e){
+  if (e.key === 'Escape' && el.welcome && el.welcome.getAttribute('aria-hidden') === 'false') {
+    closeWelcome();
+  }
+}
+
+function attachWelcomeEvents(){
+  if (!el.welcome) return;
+
+
+  if (el.welcomeStart) {
+    el.welcomeStart.addEventListener('click', () => {
+
+      participant = (el.nameInput && el.nameInput.value) || participant || 'Participante';
+      idx = 0;
+      pmTotal = 0;
+      answers = {};
+      renderQuestion();
+      if (el.quizArea) el.quizArea.classList.remove('hidden');
+      if (el.results) el.results.classList.add('hidden');
+      renderHouseScores();
+      saveState();
+      closeWelcome();
+
+      window.dispatchEvent(new CustomEvent('legado:welcome:started', { detail: { participant } }));
+    });
+  }
+  if (el.welcomeContinue) {
+    el.welcomeContinue.addEventListener('click', () => {
+
+      const loaded = loadState();
+      if (!loaded) {
+
+        participant = (el.nameInput && el.nameInput.value) || participant || 'Participante';
+        idx = 0;
+        pmTotal = 0;
+        answers = {};
+      }
+      renderQuestion();
+      if (el.quizArea) el.quizArea.classList.remove('hidden');
+      if (el.results) el.results.classList.add('hidden');
+      renderHouseScores();
+      closeWelcome();
+      window.dispatchEvent(new CustomEvent('legado:welcome:continued', { detail: { loaded } }));
+    });
+  }
+
+
+  el.welcome.addEventListener('click', onOverlayClick);
+
+  document.addEventListener('keydown', onEsc);
+}
+
+
+function attachQuizUI(){
+  if (el.nextBtn) el.nextBtn.addEventListener('click', goNext);
+  if (el.prevBtn) el.prevBtn.addEventListener('click', goPrev);
+  if (el.submitBtn) el.submitBtn.addEventListener('click', submitAnswer);
+  if (el.restartBtn) el.restartBtn.addEventListener('click', restartQuiz);
+  if (el.startBtn) {
+    el.startBtn.addEventListener('click', () => {
+      participant = (el.nameInput && el.nameInput.value) || participant || 'Participante';
+      idx = 0;
+      pmTotal = 0;
+      answers = {};
+      renderQuestion();
+      if (el.quizArea) el.quizArea.classList.remove('hidden');
+      renderHouseScores();
+      saveState();
+    });
+  }
+}
+
+
+function init(){
+
+  initTheme();
+  attachThemeListeners();
+
+
+  attachWelcomeEvents();
+
+
+  if (el.welcome) {
+    if (!isWelcomeSeen()) {
+      openWelcome();
+    } else {
+      el.welcome.classList.add('hidden');
+      el.welcome.setAttribute('aria-hidden', 'true');
+    }
+  }
+
+
+  attachQuizUI();
+
+
+  const had = loadState();
+  if (had) {
+    renderHouseScores();
+
+  }
+
+
+  window.Legado = window.Legado || {};
+  window.Legado.openWelcome = openWelcome;
+  window.Legado.closeWelcome = closeWelcome;
+  window.Legado.saveState = saveState;
+  window.Legado.loadState = loadState;
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}

@@ -135,6 +135,58 @@ body {
   box-shadow: 0 0 25px rgba(0,255,200,0.8);
 }
 
+/* ======= MODO MESTRE ======= */
+.master-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: 0.2s;
+}
+
+.master-toggle:hover {
+  opacity: 1;
+}
+
+.master-panel {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 350px;
+  background: rgba(0,0,0,0.85);
+  color: white;
+  border-top-left-radius: 14px;
+  padding: 20px;
+  border-left: 2px solid rgba(255,255,255,0.2);
+  border-top: 2px solid rgba(255,255,255,0.2);
+  backdrop-filter: blur(10px);
+}
+
+.hidden { display: none; }
+
+.btn-secondary {
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  background: #888;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-danger {
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  background: #ff4444;
+  border: none;
+  cursor: pointer;
+}
 
 .footer {
   margin-top: 50px;

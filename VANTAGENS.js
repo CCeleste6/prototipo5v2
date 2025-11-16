@@ -16,7 +16,6 @@ window.VANTAGENS = {
       { id: "p9", nome: "Vitória Inevitável", bonus: 100 }
     ]
   },
-
   "Visionários": {
     1: [
       { id: "v1", nome: "Eco da Inspiração", bonus: 10 },
@@ -34,7 +33,6 @@ window.VANTAGENS = {
       { id: "v9", nome: "Consciência Expandida", bonus: 100 }
     ]
   },
-
   "Guardiões": {
     1: [
       { id: "g1", nome: "Escudo da Ordem", bonus: 10 },
@@ -52,7 +50,6 @@ window.VANTAGENS = {
       { id: "g9", nome: "Proteção Absoluta", bonus: 100 }
     ]
   },
-
   "Solidários": {
     1: [
       { id: "s1", nome: "Laço da Harmonia", bonus: 10 },

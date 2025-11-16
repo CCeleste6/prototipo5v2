@@ -1,137 +1,61 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Legado Escolar | Modo Deluxe</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Legado Escolar</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
-  <div class="wrapper">
 
-    <header class="header">
-      <img id="rank-badge" class="rank-badge" />
-      <h1 class="title">Legado Escolar</h1>
-      <h2 id="rank-display" class="rank-name"></h2>
-    </header>
+  <h1 class="title">LEGADO ESCOLAR</h1>
 
-    <main>
-      <section class="card">
-        <h3 class="card-title">Quiz da Atividade</h3>
-        <div id="quiz"></div>
-      </section>
+  <!-- Painel do Mestre -->
+  <section id="painel-mestre" class="card">
+    <h2>🎓 Painel do Mestre</h2>
+    <input id="nomeAluno" placeholder="Nome do aluno">
+    <select id="casaAluno">
+      <option>Precursores</option>
+      <option>Visionários</option>
+      <option>Guardiões</option>
+      <option>Solidários</option>
+    </select>
+    <button onclick="criarAluno()">Criar aluno</button>
 
-      <section class="card">
-        <h3 class="card-title">Vantagens Disponíveis</h3>
-        <p class="card-subtitle">Escolha as vantagens que deseja ativar:</p>
-        <div id="vantagens-list"></div>
-      </section>
+    <button onclick="exportarCSV()">Exportar CSV</button>
+    <button onclick="resetSistema()" class="danger">Resetar Sistema</button>
+  </section>
 
-      <button id="finish-btn" class="btn-primary">Finalizar Atividade</button>
-    </main>
+  <!-- Painel do Aluno -->
+  <section id="painel-aluno" class="card">
+    <h2>👤 Painel do Aluno</h2>
+    <select id="selectAluno" onchange="renderAluno()"></select>
 
-    <footer class="footer">
-      Protótipo Oficial — Legado Escolar (Modo Deluxe)
-    </footer>
+    <div id="dadosAluno"></div>
 
+    <button onclick="ganharPM()">+ Atividade (PM)</button>
+    <button onclick="ganharXP()">+ XP</button>
+
+    <h3>Vantagens Disponíveis</h3>
+    <div id="vantagens"></div>
+
+    <h3>Inventário</h3>
+    <div id="inventario"></div>
+  </section>
+
+  <!-- Ranking -->
+  <button id="ranking-btn" class="ranking-toggle">📊 Ranking</button>
+  <div id="ranking-panel" class="ranking-panel hidden">
+    <h3>Ranking de Alunos</h3>
+    <ul id="ranking-alunos"></ul>
+
+    <h3>Ranking de Casas</h3>
+    <ul id="ranking-casas"></ul>
+
+    <button id="close-ranking">Fechar</button>
   </div>
 
   <script src="VANTAGENS.js"></script>
   <script src="app.js"></script>
-
-  <button id="master-btn" class="master-toggle">⚙ Mestre</button>
-
-<div id="master-panel" class="master-panel hidden">
-  <h3>Painel do Mestre</h3>
-  <p>Controle e ferramentas avançadas</p>
-
-  <button id="export-btn" class="btn-secondary">Exportar Dados (CSV)</button>
-  <button id="reset-btn" class="btn-danger">Resetar Tudo</button>
-
-  <div id="master-output"></div>
-
-  <button id="close-master" class="btn-secondary">Fechar</button>
-</div>
-
-
-  <button id="student-btn" class="student-toggle">🎒 Painel do Aluno</button>
-
-<div id="student-panel" class="student-panel hidden">
-  <h3>Painel do Aluno</h3>
-
-  <div class="xp-box">
-    <p>Progresso até o próximo ranque</p>
-    <div class="xp-bar">
-      <div id="xp-fill" class="xp-fill"></div>
-    </div>
-    <p id="xp-text"></p>
-  </div>
-
-  <div id="student-summary"></div>
-
-  <button id="close-student" class="btn-secondary">Fechar</button>
-</div>
-
-  <button id="ranking-btn" class="ranking-toggle">📊 Ranking</button>
-
-<div id="ranking-panel" class="ranking-panel hidden">
-  <h3>Ranking de Alunos</h3>
-  <ul id="ranking-alunos"></ul>
-
-  <h3>Ranking de Casas</h3>
-  <ul id="ranking-casas"></ul>
-
-  <button id="close-ranking" class="btn-secondary">Fechar</button>
-</div>
-
-<button id="achievements-btn" class="achievements-toggle">🏅 Conquistas</button>
-
-<div id="achievements-panel" class="achievements-panel hidden">
-  <h3>Conquistas do Aluno</h3>
-  <ul id="achievements-list"></ul>
-
-  <button id="close-achievements" class="btn-secondary">Fechar</button>
-</div>
-
-  <button id="config-btn" class="config-toggle">🛠 Configurações</button>
-
-<div id="config-panel" class="config-panel hidden">
-  <h3>Configuração do Sistema</h3>
-
-  <label>PM por Atividade:</label>
-  <input id="cfg-pm" type="number">
-
-  <label>XP necessário por nível:</label>
-  <input id="cfg-xp" type="number">
-
-  <label>Multiplicadores ativados:</label>
-  <select id="cfg-mult">
-    <option value="on">Ligados</option>
-    <option value="off">Desligados</option>
-  </select>
-
-  <button id="apply-cfg" class="btn-secondary">Salvar Configurações</button>
-
-  <hr style="margin:12px 0">
-  
-  <button id="simulate-cfg" class="btn-secondary">Rodar Simulação</button>
-
-  <button id="reset-cfg" class="btn-danger">Resetar Configurações</button>
-
-  <button id="close-config" class="btn-secondary">Fechar</button>
-</div>
-
-  <button id="inventory-btn" class="inventory-toggle">📜 Inventário</button>
-
-<div id="inventory-panel" class="inventory-panel hidden">
-  <h3>Histórico de Vantagens</h3>
-  <ul id="inventory-list"></ul>
-
-  <button id="export-inventory" class="btn-secondary">Exportar Histórico</button>
-  <button id="clear-inventory" class="btn-danger">Limpar Histórico</button>
-  <button id="close-inventory" class="btn-secondary">Fechar</button>
-</div>
-
-  
 </body>
 </html>

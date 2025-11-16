@@ -42,6 +42,8 @@ const el = {
   welcomeCard: document.querySelector('.welcome-card'),
   themeToggle: $id('theme-toggle'),
   themeToggleInline: $id('theme-toggle-inline'),
+  themeToggleLabel: $id('theme-toggle-label'),
+  themeToggleInlineLabel: $id('theme-toggle-inline-label'),
   startBtn: $id('start-btn'),
   nameInput: $id('participant-name'),
   houseSelect: $id('participant-house'),
@@ -62,18 +64,13 @@ const el = {
 
 
 function applyThemeState(isLight){
-
-  if (isLight) {
-    document.body.classList.add('theme-light');
-    document.documentElement.classList.add('light');
-  } else {
-    document.body.classList.remove('theme-light');
-    document.documentElement.classList.remove('light');
-  }
+  if (isLight) document.body.classList.add('theme-light'); else document.body.classList.remove('theme-light');
 
   if (el.themeToggle) el.themeToggle.checked = !!isLight;
   if (el.themeToggleInline) el.themeToggleInline.checked = !!isLight;
- 
+
+  if (el.themeToggleLabel) el.themeToggleLabel.textContent = isLight ? 'Modo escuro' : 'Modo claro';
+  if (el.themeToggleInlineLabel) el.themeToggleInlineLabel.textContent = isLight ? 'Modo escuro' : 'Modo claro';
   try { localStorage.setItem(THEME_KEY, JSON.stringify({ light: !!isLight })); } catch(e){}
 }
 
@@ -85,26 +82,14 @@ function initTheme(){
       applyThemeState(!!(parsed && parsed.light));
       return;
     }
-  } catch(e){ /* ignore parse errors */ }
-
+  } catch(e){}
   const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
   applyThemeState(prefersLight);
 }
 
 function attachThemeListeners(){
-  if (el.themeToggle) {
-    el.themeToggle.addEventListener('change', () => {
-      applyThemeState(el.themeToggle.checked);
-    });
-  }
-  if (el.themeToggleInline) {
-    el.themeToggleInline.addEventListener('change', () => {
-      applyThemeState(el.themeToggleInline.checked);
-    });
-  }
-  
-  window.Legado = window.Legado || {};
-  window.Legado.applyThemeState = applyThemeState;
+  if (el.themeToggle) el.themeToggle.addEventListener('change', () => applyThemeState(el.themeToggle.checked));
+  if (el.themeToggleInline) el.themeToggleInline.addEventListener('change', () => applyThemeState(el.themeToggleInline.checked));
 }
 
 
@@ -115,7 +100,6 @@ function saveState(){
     lastSavedAt = payload.savedAt;
     updateSaveIndicator(lastSavedAt);
   } catch(e){
-    console.warn('Erro ao salvar estado:', e);
     if (el.saveStatus) el.saveStatus.textContent = 'Não foi possível salvar localmente';
   }
 }
@@ -137,9 +121,7 @@ function loadState(){
       updateSaveIndicator(lastSavedAt);
       return true;
     }
-  } catch(e){
-    console.warn('Erro ao carregar estado:', e);
-  }
+  } catch(e){ console.warn('Erro ao carregar estado:', e); }
   return false;
 }
 
@@ -151,10 +133,7 @@ function clearState(){
 
 function updateSaveIndicator(ts){
   if (!el.saveStatus) return;
-  if (!ts) {
-    el.saveStatus.textContent = 'Nenhum progresso salvo';
-    return;
-  }
+  if (!ts) { el.saveStatus.textContent = 'Nenhum progresso salvo'; return; }
   const d = new Date(ts);
   el.saveStatus.textContent = `Progresso salvo em ${d.toLocaleString('pt-BR')}`;
 }
@@ -195,91 +174,63 @@ function renderQuestion(){
       b.textContent = alt;
       b.dataset.value = alt;
       b.tabIndex = 0;
-     
       b.addEventListener('click', () => {
-        
         const prev = list.querySelector('.alt.selected');
         if (prev) prev.classList.remove('selected');
         b.classList.add('selected');
         answers[q.id] = alt;
       });
       b.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          b.click();
-        }
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); b.click(); }
       });
       list.appendChild(b);
     });
     el.questionContainer.appendChild(list);
-    
     if (answers[q.id]) {
       const chosen = Array.from(list.children).find(node => node.dataset.value === answers[q.id]);
       if (chosen) chosen.classList.add('selected');
     }
   } else {
-    
     const textarea = document.createElement('textarea');
     textarea.id = `open-${q.id}`;
     textarea.value = answers[q.id] || '';
-    textarea.addEventListener('input', () => {
-      answers[q.id] = textarea.value;
-    });
+    textarea.addEventListener('input', () => { answers[q.id] = textarea.value; });
     el.questionContainer.appendChild(textarea);
   }
 
-  
   if (el.qIndex) el.qIndex.textContent = `${idx + 1} / ${allQuestions.length}`;
   if (el.pmScore) el.pmScore.textContent = `PM: ${pmTotal}`;
 }
 
-function goNext(){
-  if (idx < allQuestions.length - 1) {
-    idx++;
-    renderQuestion();
-  }
-}
-function goPrev(){
-  if (idx > 0) {
-    idx--;
-    renderQuestion();
-  }
-}
+function goNext(){ if (idx < allQuestions.length - 1) { idx++; renderQuestion(); } }
+function goPrev(){ if (idx > 0) { idx--; renderQuestion(); } }
 
 
 function submitAnswer(){
   const q = allQuestions[idx];
   const given = answers[q.id];
   let correct = false;
-  if (q.tipo && q.tipo.toLowerCase().includes('múltipla escolha')) {
+  if (q.tipo && q.tipo.toLowerCase().includes('múltipla')) {
     correct = String(given) === String(q.resposta);
   } else {
-    
     correct = String(given || '').trim().toLowerCase() === String(q.resposta || '').trim().toLowerCase();
   }
   if (correct) {
     pmTotal += Number(q.pontos_PM || 0);
-
     if (Array.isArray(q.gatilhos_PC)) {
       q.gatilhos_PC.forEach(g => {
         if (houseState[g.casa]) houseState[g.casa].pc += Number(g.pc || 0);
       });
     }
   }
-
-  if (idx < allQuestions.length - 1) {
-    idx++;
-    renderQuestion();
-  } else {
-    showResults();
-  }
+  if (idx < allQuestions.length - 1) { idx++; renderQuestion(); } else { showResults(); }
   saveState();
   renderHouseScores();
 }
 
 function showResults(){
   if (!el.results || !el.resultDetail) return;
-  el.quizArea.classList.add('hidden');
+  if (el.quizArea) el.quizArea.classList.add('hidden');
   el.results.classList.remove('hidden');
   el.resultDetail.innerHTML = `<p>Participante: ${participant || '—'}</p>
     <p>PM total: ${pmTotal}</p>
@@ -293,7 +244,6 @@ function restartQuiz(){
   participant = null; idx = 0; pmTotal = 0; answers = {};
   Object.keys(houseState).forEach(h => houseState[h].pc = 0);
   clearState();
-  // reset UI
   if (el.nameInput) el.nameInput.value = '';
   if (el.houseSelect) el.houseSelect.selectedIndex = 0;
   if (el.results) el.results.classList.add('hidden');
@@ -309,9 +259,7 @@ function openWelcome(){
   if (!el.welcome) return;
   el.welcome.classList.remove('hidden');
   el.welcome.setAttribute('aria-hidden', 'false');
-
   document.body.style.overflow = 'hidden';
-
   if (el.welcomeStart) el.welcomeStart.focus();
 }
 
@@ -321,68 +269,49 @@ function closeWelcome(){
   el.welcome.setAttribute('aria-hidden', 'true');
   document.body.style.overflow = '';
   markWelcomeSeen();
-
   if (el.startBtn) el.startBtn.focus();
 }
 
 function onOverlayClick(e){
-
   if (!el.welcomeCard) return;
-  if (!el.welcomeCard.contains(e.target)) {
-    closeWelcome();
-  }
+  if (!el.welcomeCard.contains(e.target)) closeWelcome();
 }
-
 function onEsc(e){
-  if (e.key === 'Escape' && el.welcome && el.welcome.getAttribute('aria-hidden') === 'false') {
-    closeWelcome();
-  }
+  if (e.key === 'Escape' && el.welcome && el.welcome.getAttribute('aria-hidden') === 'false') closeWelcome();
 }
 
 function attachWelcomeEvents(){
   if (!el.welcome) return;
-
-
   if (el.welcomeStart) {
     el.welcomeStart.addEventListener('click', () => {
-
       participant = (el.nameInput && el.nameInput.value) || participant || 'Participante';
-      idx = 0;
-      pmTotal = 0;
-      answers = {};
-      renderQuestion();
+      idx = 0; pmTotal = 0; answers = {};
       if (el.quizArea) el.quizArea.classList.remove('hidden');
       if (el.results) el.results.classList.add('hidden');
+      renderQuestion();
       renderHouseScores();
       saveState();
       closeWelcome();
-
       window.dispatchEvent(new CustomEvent('legado:welcome:started', { detail: { participant } }));
     });
   }
   if (el.welcomeContinue) {
     el.welcomeContinue.addEventListener('click', () => {
-
       const loaded = loadState();
       if (!loaded) {
-
         participant = (el.nameInput && el.nameInput.value) || participant || 'Participante';
-        idx = 0;
-        pmTotal = 0;
-        answers = {};
+        idx = 0; pmTotal = 0; answers = {};
       }
-      renderQuestion();
       if (el.quizArea) el.quizArea.classList.remove('hidden');
       if (el.results) el.results.classList.add('hidden');
+      renderQuestion();
       renderHouseScores();
       closeWelcome();
       window.dispatchEvent(new CustomEvent('legado:welcome:continued', { detail: { loaded } }));
     });
   }
 
-
   el.welcome.addEventListener('click', onOverlayClick);
-
   document.addEventListener('keydown', onEsc);
 }
 
@@ -395,11 +324,9 @@ function attachQuizUI(){
   if (el.startBtn) {
     el.startBtn.addEventListener('click', () => {
       participant = (el.nameInput && el.nameInput.value) || participant || 'Participante';
-      idx = 0;
-      pmTotal = 0;
-      answers = {};
-      renderQuestion();
+      idx = 0; pmTotal = 0; answers = {};
       if (el.quizArea) el.quizArea.classList.remove('hidden');
+      renderQuestion();
       renderHouseScores();
       saveState();
     });
@@ -408,33 +335,19 @@ function attachQuizUI(){
 
 
 function init(){
-
   initTheme();
   attachThemeListeners();
-
-
   attachWelcomeEvents();
 
-
   if (el.welcome) {
-    if (!isWelcomeSeen()) {
-      openWelcome();
-    } else {
-      el.welcome.classList.add('hidden');
-      el.welcome.setAttribute('aria-hidden', 'true');
-    }
+    if (!isWelcomeSeen()) openWelcome();
+    else { el.welcome.classList.add('hidden'); el.welcome.setAttribute('aria-hidden','true'); }
   }
-
 
   attachQuizUI();
 
-
   const had = loadState();
-  if (had) {
-    renderHouseScores();
-
-  }
-
+  if (had) renderHouseScores();
 
   window.Legado = window.Legado || {};
   window.Legado.openWelcome = openWelcome;
@@ -443,8 +356,5 @@ function init(){
   window.Legado.loadState = loadState;
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
-} else {
-  init();
-}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+else init();

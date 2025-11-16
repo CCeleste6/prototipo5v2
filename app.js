@@ -275,3 +275,47 @@ function updateXPDisplay() {
     | Level interno: ${Math.floor(xp / XP_NEEDED)}
   `;
 }
+
+/******************************
+ * Sistema de Ranking
+ *****************************/
+const rankingBtn = document.getElementById("ranking-btn");
+const rankingPanel = document.getElementById("ranking-panel");
+const closeRanking = document.getElementById("close-ranking");
+const rankingAlunos = document.getElementById("ranking-alunos");
+const rankingCasas = document.getElementById("ranking-casas");
+
+rankingBtn.addEventListener("click", () => {
+  rankingPanel.classList.toggle("hidden");
+  renderRankings();
+});
+
+closeRanking.addEventListener("click", () => {
+  rankingPanel.classList.add("hidden");
+});
+
+function renderRankings() {
+  const raw = JSON.parse(localStorage.getItem("alunos") || "{}");
+
+  const alunos = Object.values(raw);
+
+  alunos.sort((a,b) => (b.pc + b.pm) - (a.pc + a.pm));
+
+  rankingAlunos.innerHTML = alunos.map((a, i) => `
+    <li><b>${i+1}º</b> — ${a.nome} (${a.casa}) — <b>${a.pc + a.pm} pts</b></li>
+  `).join("");
+
+
+  const casas = {};
+
+  alunos.forEach(a => {
+    if (!casas[a.casa]) casas[a.casa] = 0;
+    casas[a.casa] += (a.pc + a.pm);
+  });
+
+  const casasOrdenadas = Object.entries(casas).sort((a,b) => b[1] - a[1]);
+
+  rankingCasas.innerHTML = casasOrdenadas.map((c,i) => `
+    <li><b>${i+1}º</b> — ${c[0]} — <b>${c[1]} pts</b></li>
+  `).join("");
+}

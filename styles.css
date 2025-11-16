@@ -1,129 +1,51 @@
-/* ====== RESET ====== */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Segoe UI", sans-serif;
+:root{
+  --bg:#0f1720;
+  --panel: rgba(255,255,255,0.04);
+  --accent:#2dd4bf;
+  --muted: rgba(255,255,255,0.6);
 }
 
-body {
-  background: #121212;
-  color: white;
-  padding: 25px;
-  text-align: center;
+*{box-sizing:border-box;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+
+body{
+  margin:0;
+  background:linear-gradient(180deg,#071021 0%, #0f1720 100%);
+  color:#fff;
+  min-height:100vh;
 }
 
-/* ====== GLOBAL ====== */
-.title {
-  font-size: 35px;
-  margin-bottom: 20px;
-  font-weight: 700;
-  letter-spacing: 1px;
+header{padding:18px 24px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.03)}
+h1{margin:0;font-size:20px;letter-spacing:1px}
+
+.container{max-width:980px;margin:18px auto;padding:0 16px}
+
+.panel{
+  background:var(--panel);
+  border-radius:12px;
+  padding:16px;
+  margin:12px 0;
+  border:1px solid rgba(255,255,255,0.03);
 }
 
-button {
-  background: #3b82f6;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  color: white;
-  margin: 5px;
-  transition: 0.2s;
-}
+.aluno-top{display:flex;gap:12px;align-items:center}
+.badge{width:90px;height:90px;object-fit:contain;border-radius:8px;background:rgba(255,255,255,0.02);padding:8px}
 
-button:hover {
-  background: #1e65d8;
-}
+.stats{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
+.stats div{background:transparent;padding:6px 8px;border-radius:8px;border:1px solid rgba(255,255,255,0.03)}
 
-button.danger {
-  background: #ff3d3d;
-}
+#xp-bar{width:100%;height:12px;background:rgba(255,255,255,0.06);border-radius:8px;margin-top:6px;overflow:hidden}
+#xp-fill{height:100%;background:linear-gradient(90deg,var(--accent),#60a5fa);width:0%}
 
-.card {
-  border: 2px solid rgba(255,255,255,0.15);
-  background: rgba(255,255,255,0.05);
-  padding: 20px;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 500px;
-  margin: 20px auto;
-}
+.actions{margin-top:12px}
+.actions button{margin-right:8px}
 
-/* ====== RANKING ====== */
-.ranking-toggle {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 12px 22px;
-  border-radius: 10px;
-  font-size: 16px;
-  cursor: pointer;
-  opacity: 0.4;
-  transition: 0.2s;
-}
+.quiz-actions, .panel-actions{margin-top:12px}
+#quiz-form .q{margin:8px 0;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.02)}
 
-.ranking-toggle:hover {
-  opacity: 1;
-}
+label{display:block;margin:6px 0;color:var(--muted)}
+input[type="text"], input[type="number"], select{width:100%;padding:8px;border-radius:8px;border:none;background:rgba(255,255,255,0.03);color:white}
 
-.ranking-panel {
-  position: fixed;
-  top: 10%;
-  left: 50%;
-  width: 400px;
-  transform: translateX(-50%);
-  background: rgba(255,255,255,0.12);
-  backdrop-filter: blur(16px);
-  border-radius: 18px;
-  padding: 20px;
-  border: 2px solid rgba(255,255,255,0.25);
-  box-shadow: 0 0 25px rgba(0,0,0,0.5);
-  color: white;
-}
+button{background:linear-gradient(180deg,#14b8a6,#0ea5a0);border:none;padding:8px 10px;border-radius:8px;color:#021;cursor:pointer}
+button:hover{opacity:0.95}
 
-.hidden {
-  display: none;
-}
-
-#ranking-panel h3 {
-  margin: 12px 0 6px;
-  border-bottom: 1px solid rgba(255,255,255,0.2);
-  padding-bottom: 4px;
-  opacity: 0.9;
-}
-
-#ranking-panel ul {
-  list-style: none;
-  margin-bottom: 16px;
-  padding: 0;
-}
-
-#ranking-panel li {
-  padding: 6px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-
-/* ====== INVENTÁRIO ====== */
-#inventario div {
-  border: 1px solid rgba(255,255,255,0.2);
-  padding: 6px;
-  border-radius: 8px;
-  margin: 5px;
-}
-
-/* ====== XP BAR ====== */
-#xpBar {
-  width: 100%;
-  height: 14px;
-  background: rgba(255,255,255,0.2);
-  border-radius: 12px;
-  overflow: hidden;
-  margin: 5px 0;
-}
-
-#xpBar div {
-  height: 100%;
-  background: #22c55e;
-}
+footer{padding:12px;text-align:center;color:rgba(255,255,255,0.5);font-size:13px}

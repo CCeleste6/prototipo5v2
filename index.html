@@ -1,83 +1,55 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Legado Escolar · Quiz PM / PC</title>
-
-
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-
-
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LEGADO ESCOLAR · Quiz PM / PC</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <img src="https://cceleste6.github.io/prototipo5v2/logo-optimized.jpeg" alt="Legado Escolar" class="logo">
-      <div class="title">
-        <h1>LEGADO ESCOLAR</h1>
-        <p class="tag">Quiz PM · PC</p>
-      </div>
-    </div>
 
-    <div class="controls">
-      <button id="toggle-theme" class="btn icon">🌙</button>
-      <button id="save-progress" class="btn">Salvar</button>
-    </div>
+  <header class="header">
+    <h1 class="header__title">LEGADO ESCOLAR</h1>
+    <p class="header__subtitle">Quiz PM · PC</p>
+    <button id="save-progress" class="btn btn--small">Salvar</button>
   </header>
 
-  <main class="container">
-    <aside class="scoreboard">
-      <h2>Casas</h2>
-      <ul class="houses">
-        <li><strong>Precursores</strong> <span class="pc" id="pc-precursores">0</span></li>
-        <li><strong>Visionários</strong> <span class="pc" id="pc-visionarios">0</span></li>
-        <li><strong>Guardiões</strong> <span class="pc" id="pc-guardioes">0</span></li>
-        <li><strong>Solidários</strong> <span class="pc" id="pc-solidarios">0</span></li>
-      </ul>
+  <main class="quiz-container">
+    <section class="scores">
+      <div class="score">Precursores: <span id="score-precursores">0</span></div>
+      <div class="score">Visionários: <span id="score-visionarios">0</span></div>
+      <div class="score">Guardiões: <span id="score-guardioes">0</span></div>
+      <div class="score">Solidários: <span id="score-solidarios">0</span></div>
+    </section>
 
-      <div class="summary">
-        <p><strong>PM total:</strong> <span id="pm-total">0</span></p>
-        <p class="progress-msg" id="progress-msg">Nenhum progresso salvo</p>
+    <section class="quiz">
+      <div id="question-container" class="question-container">
+        <!-- Aqui vai a pergunta carregada via JS -->
+        <p id="question-text" class="question-text">Carregando pergunta...</p>
       </div>
-    </aside>
-
-    <section class="quiz-area">
-      <div class="card">
-        <div class="question-header">
-          <span id="q-index">1</span> / <span id="q-total">1</span>
-        </div>
-
-        <div class="question" id="question-text">
-          Carregando pergunta...
-        </div>
-
-        <ul class="answers" id="answers-list">
-          <!-- Radio buttons gerados via JS -->
-        </ul>
-
-        <div class="quiz-actions">
-          <button id="prev-btn" class="btn">Anterior</button>
-          <button id="next-btn" class="btn primary">Próxima</button>
-          <button id="submit-btn" class="btn success">Enviar Resposta</button>
-        </div>
+      <div class="navigation">
+        <button id="prev-btn" class="btn btn--nav">Anterior</button>
+        <button id="next-btn" class="btn btn--nav">Próxima</button>
+        <button id="submit-btn" class="btn btn--primary">Enviar Resposta</button>
       </div>
+    </section>
 
-      <div class="result-card" id="result-card" hidden>
-        <h3>Resultados</h3>
-        <div id="result-body"></div>
-        <div class="result-actions">
-          <button id="restart-btn" class="btn warning">Reiniciar</button>
-        </div>
+    <section class="results" id="results" style="display: none;">
+      <h2>Resultados</h2>
+      <div class="final-scores">
+        <div>Precursores: <span id="final-precursores">0</span></div>
+        <div>Visionários: <span id="final-visionarios">0</span></div>
+        <div>Guardiões: <span id="final-guardioes">0</span></div>
+        <div>Solidários: <span id="final-solidarios">0</span></div>
       </div>
+      <button id="restart-btn" class="btn btn--secondary">Reiniciar</button>
     </section>
   </main>
 
   <footer class="footer">
-    <p>Legado Escolar · Sistema de pontuação educacional</p>
+    <p>Nenhum progresso salvo</p>
   </footer>
 
-  <script src="apps.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

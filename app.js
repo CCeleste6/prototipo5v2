@@ -1,6 +1,9 @@
+const STORAGE_KEY = "legadoEscolarAluno";
 
-const PM_FIXO = 10;
 
+let PM_ATIVIDADE = Number(localStorage.getItem("cfg_pm")) || 10;
+let XP_NEEDED = Number(localStorage.getItem("cfg_xp")) || 100;
+let MULTIPLICADORES_ATIVOS = localStorage.getItem("cfg_mult") !== "off";
 
 const RANQUES = [
   { nome: "Aprendiz", min: 0, max: 2000 },
@@ -10,7 +13,7 @@ const RANQUES = [
   { nome: "Mentor", min: 14001, max: 20000 },
   { nome: "Erudito", min: 20001, max: 28000 },
   { nome: "Filósofo", min: 28001, max: 40000 },
-  { nome: "Sábio", min: 40001, max: 55000 },
+  { nome: "Sábio", max: 55000, min: 40001 },
   { nome: "Luminar", min: 55001, max: 80000 },
   { nome: "Oráculo", min: 80001, max: Infinity },
 ];
@@ -28,11 +31,8 @@ const RANK_DATA = {
   "Oráculo":    { img: "assets/ranks/oraculo.png" }
 };
 
-
 const VANTAGENS = window.VANTAGENS;
 
-
-const STORAGE_KEY = "legadoEscolarAluno";
 
 function saveAluno() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(aluno));
@@ -41,7 +41,6 @@ function saveAluno() {
 function loadAluno() {
   return JSON.parse(localStorage.getItem(STORAGE_KEY));
 }
-
 
 let aluno = loadAluno() || {
   nome: prompt("Nome do aluno:"),
@@ -76,7 +75,6 @@ const QUIZ = [
   { q:"Se João tem 12 balas e dá 5, fica com:", options:["5","7","8","9"], answer:1 },
   { q:"1/4 + 1/4 =", options:["1/2","1/4","3/4","1"], answer:0 },
   { q:"Próximo número: 2,4,8,16 __", options:["18","20","24","32"], answer:3 },
-
   { q:"Qual frase está correta?", options:["Nós vai", "Nós vamos", "Nós vamos ir"], answer:1 },
   { q:"Classe de 'rapidamente':", options:["Verbo","Adjetivo","Advérbio","Substantivo"], answer:2 },
   { q:"Em 'As flores foram colhidas', o termo é:", options:["voz ativa","voz passiva"], answer:1 },
@@ -155,16 +153,25 @@ function finalizarAtividade() {
     else totalPC += v.bonus || 0;
   });
 
-  totalPC *= mult;
-  aluno.pm += PM_FIXO;
+  totalPC = MULTIPLICADORES_ATIVOS ? totalPC * mult : totalPC;
+
+  aluno.pm += PM_ATIVIDADE;
   aluno.pc += totalPC;
+
+  addXP(acertos * 10);
+  addToInventory(aluno.casa, { nome:"Atividade concluída", bonus: totalPC });
+
+  localStorage.setItem("atividades_completas",
+    (Number(localStorage.getItem("atividades_completas") || 0) + 1)
+  );
 
   alert(`
 ATIVIDADE CONCLUÍDA!
 
 Quiz: ${acertos}/${QUIZ.length} acertos
-+${PM_FIXO} PM (fixo)
++${PM_ATIVIDADE} PM (fixo)
 +${totalPC} PC (vantagens)
++${acertos * 10} XP
 
 Seu novo ranque: ${getRanque(aluno.pm)}
   `);
@@ -174,70 +181,10 @@ Seu novo ranque: ${getRanque(aluno.pm)}
   updateRankBadge();
   renderVantagens();
   renderQuiz();
+  tryUnlockAchievements();
 }
 
 
-window.onload = () => {
-  updateRankBadge();
-  renderQuiz();
-  renderVantagens();
-};
-
-document.getElementById("finish-btn").addEventListener("click", finalizarAtividade);
-
-/*******************************
- * MODO MESTRE
- ******************************/
-const masterBtn = document.getElementById("master-btn");
-const masterPanel = document.getElementById("master-panel");
-const closeMaster = document.getElementById("close-master");
-const exportBtn = document.getElementById("export-btn");
-const resetBtn = document.getElementById("reset-btn");
-const masterOutput = document.getElementById("master-output");
-
-masterBtn.addEventListener("click", () => {
-  masterPanel.classList.toggle("hidden");
-  renderMasterData();
-});
-
-closeMaster.addEventListener("click", () => {
-  masterPanel.classList.add("hidden");
-});
-
-resetBtn.addEventListener("click", () => {
-  if (confirm("Tem certeza que quer apagar tudo?")) {
-    localStorage.clear();
-    alert("Dados resetados!");
-    location.reload();
-  }
-});
-
-exportBtn.addEventListener("click", exportCSV);
-
-function renderMasterData() {
-  masterOutput.textContent = JSON.stringify(localStorage, null, 2);
-}
-
-function exportCSV() {
-  let csv = "key,value\n";
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    csv += `${key},"${localStorage.getItem(key)}"\n`;
-  }
-
-  const blob = new Blob([csv], {type: "text/csv"});
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "legado_dados.csv";
-  a.click();
-}
-
-
-/******************************
- * PAINEL DO ALUNO (XP SYSTEM)
- *****************************/
 const studentBtn = document.getElementById("student-btn");
 const studentPanel = document.getElementById("student-panel");
 const closeStudent = document.getElementById("close-student");
@@ -246,8 +193,6 @@ const xpText = document.getElementById("xp-text");
 const studentSummary = document.getElementById("student-summary");
 
 let xp = Number(localStorage.getItem("xp") || 0);
-
-const XP_NEEDED = 100; // you can adjust this later
 
 studentBtn.addEventListener("click", () => {
   studentPanel.classList.toggle("hidden");
@@ -271,58 +216,53 @@ function updateXPDisplay() {
   xpText.textContent = `${xp % XP_NEEDED}/${XP_NEEDED} XP para próxima evolução`;
 
   studentSummary.textContent = `
-    XP total: ${xp}
-    | Level interno: ${Math.floor(xp / XP_NEEDED)}
+| XP total: ${xp}
+| Nível: ${Math.floor(xp / XP_NEEDED)}
   `;
 }
 
-/******************************
- * Sistema de Ranking
- *****************************/
-const rankingBtn = document.getElementById("ranking-btn");
-const rankingPanel = document.getElementById("ranking-panel");
-const closeRanking = document.getElementById("close-ranking");
-const rankingAlunos = document.getElementById("ranking-alunos");
-const rankingCasas = document.getElementById("ranking-casas");
 
-rankingBtn.addEventListener("click", () => {
-  rankingPanel.classList.toggle("hidden");
-  renderRankings();
+const masterBtn = document.getElementById("master-btn");
+const masterPanel = document.getElementById("master-panel");
+const closeMaster = document.getElementById("close-master");
+const exportBtn = document.getElementById("export-btn");
+const resetBtn = document.getElementById("reset-btn");
+const masterOutput = document.getElementById("master-output");
+
+masterBtn.addEventListener("click", () => {
+  masterPanel.classList.toggle("hidden");
+  masterOutput.textContent = JSON.stringify(JSON.parse(localStorage.getItem(STORAGE_KEY)), null, 2);
 });
 
-closeRanking.addEventListener("click", () => {
-  rankingPanel.classList.add("hidden");
+closeMaster.addEventListener("click", () => {
+  masterPanel.classList.add("hidden");
 });
 
-function renderRankings() {
-  const raw = JSON.parse(localStorage.getItem("alunos") || "{}");
+resetBtn.addEventListener("click", () => {
+  if (confirm("Tem certeza que quer apagar tudo?")) {
+    localStorage.clear();
+    alert("Dados resetados!");
+    location.reload();
+  }
+});
 
-  const alunos = Object.values(raw);
+exportBtn.addEventListener("click", exportCSV);
 
-  alunos.sort((a,b) => (b.pc + b.pm) - (a.pc + a.pm));
+function exportCSV() {
+  let csv = "key,value\n";
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    csv += `${key},"${localStorage.getItem(key)}"\n`;
+  }
 
-  rankingAlunos.innerHTML = alunos.map((a, i) => `
-    <li><b>${i+1}º</b> — ${a.nome} (${a.casa}) — <b>${a.pc + a.pm} pts</b></li>
-  `).join("");
-
-
-  const casas = {};
-
-  alunos.forEach(a => {
-    if (!casas[a.casa]) casas[a.casa] = 0;
-    casas[a.casa] += (a.pc + a.pm);
-  });
-
-  const casasOrdenadas = Object.entries(casas).sort((a,b) => b[1] - a[1]);
-
-  rankingCasas.innerHTML = casasOrdenadas.map((c,i) => `
-    <li><b>${i+1}º</b> — ${c[0]} — <b>${c[1]} pts</b></li>
-  `).join("");
+  const blob = new Blob([csv], {type: "text/csv"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "legado_dados.csv";
+  a.click();
 }
 
-/******************************
- * SISTEMA DE CONQUISTAS
- *****************************/
+
 const ACHIEVEMENTS_DATA = [
   {
     id: "first_activity",
@@ -352,16 +292,15 @@ const ACHIEVEMENTS_DATA = [
     id: "rank_5",
     name: "Nobre da Aprendizagem",
     desc: "Alcançou o Ranque 5",
-    condition: () => currentRank >= 5
+    condition: () => getRanqueNumero() >= 5
   },
   {
     id: "house_loyalty",
     name: "Fiel à Casa",
     desc: "Participou de 10 atividades na mesma casa",
-    condition: () => Number(localStorage.getItem("atividades_na_casa")) >= 10
+    condition: () => Number(localStorage.getItem("atividades_completas")) >= 10
   }
 ];
-
 
 const achievementsBtn = document.getElementById("achievements-btn");
 const achievementsPanel = document.getElementById("achievements-panel");
@@ -413,158 +352,14 @@ function showAchievementToast(name) {
   alert(`🏅 Nova conquista desbloqueada:\n${name}`);
 }
 
-
 function totalActivities() {
   return Number(localStorage.getItem("atividades_completas") || 0);
 }
 
-/**********************************
- * CONFIGURADOR DO MESTRE
- **********************************/
-let PM_ATIVIDADE = Number(localStorage.getItem("cfg_pm")) || 10;
-let XP_NEEDED = Number(localStorage.getItem("cfg_xp")) || 100;
-let MULTIPLICADORES_ATIVOS = localStorage.getItem("cfg_mult") !== "off";
 
-const configBtn = document.getElementById("config-btn");
-const configPanel = document.getElementById("config-panel");
-const closeConfig = document.getElementById("close-config");
-const applyCfg = document.getElementById("apply-cfg");
-const resetCfg = document.getElementById("reset-cfg");
-const simulateCfg = document.getElementById("simulate-cfg");
-
-const cfgPM = document.getElementById("cfg-pm");
-const cfgXP = document.getElementById("cfg-xp");
-const cfgMult = document.getElementById("cfg-mult");
-
-configBtn.addEventListener("click", () => {
-  configPanel.classList.toggle("hidden");
-  loadSettings();
-});
-
-closeConfig.addEventListener("click", () => {
-  configPanel.classList.add("hidden");
-});
-
-applyCfg.addEventListener("click", () => {
-  saveSettings();
-  alert("Configurações salvas!");
-});
-
-resetCfg.addEventListener("click", () => {
-  localStorage.removeItem("cfg_pm");
-  localStorage.removeItem("cfg_xp");
-  localStorage.removeItem("cfg_mult");
-  alert("Configurações restauradas aos padrões.");
-  location.reload();
-});
-
-simulateCfg.addEventListener("click", () => {
-  alert(`
-SIMULAÇÃO:
-PM por atividade: ${PM_ATIVIDADE}
-XP por nível: ${XP_NEEDED}
-Multiplicadores: ${MULTIPLICADORES_ATIVOS ? "ATIVOS" : "DESLIGADOS"}
-  `);
-});
-
-function loadSettings() {
-  cfgPM.value = PM_ATIVIDADE;
-  cfgXP.value = XP_NEEDED;
-  cfgMult.value = MULTIPLICADORES_ATIVOS ? "on" : "off";
-}
-
-function saveSettings() {
-  localStorage.setItem("cfg_pm", cfgPM.value);
-  localStorage.setItem("cfg_xp", cfgXP.value);
-  localStorage.setItem("cfg_mult", cfgMult.value);
-
-  PM_ATIVIDADE = Number(cfgPM.value);
-  XP_NEEDED = Number(cfgXP.value);
-  MULTIPLICADORES_ATIVOS = cfgMult.value === "on";
-}
-
-/********************************************
- * INVENTÁRIO / HISTÓRICO DE VANTAGENS
- ********************************************/
-const inventoryBtn = document.getElementById("inventory-btn");
-const inventoryPanel = document.getElementById("inventory-panel");
-const closeInventory = document.getElementById("close-inventory");
-const inventoryList = document.getElementById("inventory-list");
-const clearInventoryBtn = document.getElementById("clear-inventory");
-const exportInventoryBtn = document.getElementById("export-inventory");
-
-inventoryBtn.addEventListener("click", () => {
-  inventoryPanel.classList.toggle("hidden");
-  renderInventory();
-});
-
-closeInventory.addEventListener("click", () => {
-  inventoryPanel.classList.add("hidden");
-});
-
-clearInventoryBtn.addEventListener("click", () => {
-  if (confirm("Tem certeza que quer apagar todo o histórico?")) {
-    localStorage.removeItem("inventory");
-    renderInventory();
-    alert("Inventário apagado");
-  }
-});
-
-exportInventoryBtn.addEventListener("click", exportInventory);
-
-/********************************************
- * CORE FUNCTIONS
- ********************************************/
-function addToInventory(casa, vantagemObj) {
-  const log = JSON.parse(localStorage.getItem("inventory") || "[]");
-
-  log.push({
-    id: Date.now(),
-    casa,
-    vantagem: vantagemObj.nome,
-    bonus: vantagemObj.bonus || 0,
-    multiplier: vantagemObj.multiplier || null,
-    timestamp: new Date().toISOString()
-  });
-
-  localStorage.setItem("inventory", JSON.stringify(log));
-}
-
-function renderInventory() {
-  const log = JSON.parse(localStorage.getItem("inventory") || "[]");
-
-  if (log.length === 0) {
-    inventoryList.innerHTML = "<li>Nenhuma vantagem registrada ainda.</li>";
-    return;
-  }
-
-  inventoryList.innerHTML = log
-    .slice()
-    .reverse()
-    .map(item => `
-      <li>
-        <b>${item.vantagem}</b> — ${item.casa}
-        <br>
-        ${item.multiplier ? `Multiplicador x${item.multiplier}` : `+${item.bonus} PC`}
-        <br>
-        <small>${new Date(item.timestamp).toLocaleString("pt-BR")}</small>
-      </li>
-    `)
-    .join("");
-}
-
-function exportInventory() {
-  const log = JSON.parse(localStorage.getItem("inventory") || "[]");
-  if (!log.length) return alert("Nada para exportar!");
-
-  let csv = "casa,vantagem,bonus,multiplicador,timestamp\n";
-  log.forEach(item => {
-    csv += `"${item.casa}","${item.vantagem}",${item.bonus},${item.multiplier || ""},"${item.timestamp}"\n`;
-  });
-
-  const blob = new Blob([csv], {type:"text/csv"});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "inventario_legado.csv";
-  a.click();
-}
+window.onload = () => {
+  updateRankBadge();
+  renderQuiz();
+  renderVantagens();
+};
+document.getElementById("finish-btn").addEventListener("click", finalizarAtividade);

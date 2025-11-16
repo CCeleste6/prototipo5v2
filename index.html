@@ -42,4 +42,76 @@
         </picture>
         <div>
           <div class="brand-title">LEGADO ESCOLAR</div>
-          <div class="brand-sub">
+          <div class="brand-sub">Quiz PM · PC</div>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <div id="save-status" class="save-status">Nenhum progresso salvo</div>
+
+        <label class="theme-switch-inline">
+          <input type="checkbox" id="theme-toggle-inline" aria-label="Alternar tema" />
+          <span id="theme-toggle-inline-label">Modo claro</span>
+        </label>
+      </div>
+    </header>
+
+    <section class="top-panel">
+      <div class="houses" id="house-scores">
+        <div class="house" data-house="Precursores"><strong>Precursores</strong><div class="pc">PC: 0</div></div>
+        <div class="house" data-house="Visionários"><strong>Visionários</strong><div class="pc">PC: 0</div></div>
+        <div class="house" data-house="Guardiões"><strong>Guardiões</strong><div class="pc">PC: 0</div></div>
+        <div class="house" data-house="Solidários"><strong>Solidários</strong><div class="pc">PC: 0</div></div>
+      </div>
+
+      <form id="participant-form" class="participant-form" onsubmit="return false;">
+        <input id="participant-name" placeholder="Seu nome" aria-label="Seu nome" />
+        <select id="participant-house" aria-label="Selecione sua casa">
+          <option>Precursores</option>
+          <option>Visionários</option>
+          <option>Guardiões</option>
+          <option>Solidários</option>
+        </select>
+        <button id="start-btn" class="btn-primary" type="button">Iniciar Quiz</button>
+      </form>
+    </section>
+
+    <section id="quiz-area" class="card hidden" aria-live="polite">
+      <div id="question-container"></div>
+
+      <div class="controls">
+        <button id="prev-btn" class="btn-ghost" type="button">Anterior</button>
+
+        <div class="pager">
+          <span id="question-index"></span>
+          <span id="pm-score">PM: 0</span>
+        </div>
+
+        <button id="next-btn" class="btn-ghost" type="button">Próxima</button>
+      </div>
+
+      <div class="submit-row">
+        <button id="submit-btn" class="btn-primary" type="button">Enviar Resposta</button>
+      </div>
+
+      <div id="loader" class="loader hidden" aria-hidden="true">
+        <div class="spinner" aria-hidden="true"></div>
+      </div>
+    </section>
+
+    <section id="results" class="card hidden" aria-live="polite">
+      <h2>Resultados</h2>
+      <div id="result-detail"></div>
+      <div class="results-actions">
+        <button id="restart-btn" class="btn-ghost" type="button">Reiniciar</button>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <small>Legado Escolar · Sistema de pontuação educacional</small>
+    </footer>
+  </main>
+
+  <script type="module" src="apps.js"></script>
+</body>
+</html>

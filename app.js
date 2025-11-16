@@ -1,5 +1,5 @@
 /**************************************
- * VARIÁVEIS PRINCIPAIS
+ * VARIÁVEIS PRINCIPAIS 
  **************************************/
 const STORAGE_KEY = "legadoEscolarAluno";
 

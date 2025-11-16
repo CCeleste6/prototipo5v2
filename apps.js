@@ -2,6 +2,7 @@ const STORAGE_KEY = 'quiz-pm-pc:v1';
 const THEME_KEY = 'legado-theme:v1';
 const WELCOME_KEY = 'legado-welcome-seen:v1';
 
+
 const QUESTIONS = {
   math: [
     {"id":"m1","tema":"Matemática","tipo":"Múltipla escolha","enunciado":"Calcule o valor de 3/4 de 48.","alternativas":["32","36","24","16"],"resposta":"36","pontos_PM":5,"gatilhos_PC":[{"tipo":"Marca Individual I","casa":"Precursores","pc":20}]},
@@ -63,14 +64,16 @@ const el = {
 };
 
 
-function applyThemeState(isLight){
-  if (isLight) document.body.classList.add('theme-light'); else document.body.classList.remove('theme-light');
+function applyTheme(isLight){
+  if (isLight) document.body.classList.add('theme-light');
+  else document.body.classList.remove('theme-light');
 
   if (el.themeToggle) el.themeToggle.checked = !!isLight;
   if (el.themeToggleInline) el.themeToggleInline.checked = !!isLight;
 
   if (el.themeToggleLabel) el.themeToggleLabel.textContent = isLight ? 'Modo escuro' : 'Modo claro';
   if (el.themeToggleInlineLabel) el.themeToggleInlineLabel.textContent = isLight ? 'Modo escuro' : 'Modo claro';
+
   try { localStorage.setItem(THEME_KEY, JSON.stringify({ light: !!isLight })); } catch(e){}
 }
 
@@ -79,17 +82,17 @@ function initTheme(){
     const raw = localStorage.getItem(THEME_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      applyThemeState(!!(parsed && parsed.light));
+      applyTheme(!!(parsed && parsed.light));
       return;
     }
   } catch(e){}
   const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
-  applyThemeState(prefersLight);
+  applyTheme(prefersLight);
 }
 
-function attachThemeListeners(){
-  if (el.themeToggle) el.themeToggle.addEventListener('change', () => applyThemeState(el.themeToggle.checked));
-  if (el.themeToggleInline) el.themeToggleInline.addEventListener('change', () => applyThemeState(el.themeToggleInline.checked));
+function attachThemeHandlers(){
+  if (el.themeToggle) el.themeToggle.addEventListener('change', () => applyTheme(el.themeToggle.checked));
+  if (el.themeToggleInline) el.themeToggleInline.addEventListener('change', () => applyTheme(el.themeToggleInline.checked));
 }
 
 
@@ -282,19 +285,18 @@ function onEsc(e){
 
 function attachWelcomeEvents(){
   if (!el.welcome) return;
+
   if (el.welcomeStart) {
     el.welcomeStart.addEventListener('click', () => {
       participant = (el.nameInput && el.nameInput.value) || participant || 'Participante';
       idx = 0; pmTotal = 0; answers = {};
       if (el.quizArea) el.quizArea.classList.remove('hidden');
       if (el.results) el.results.classList.add('hidden');
-      renderQuestion();
-      renderHouseScores();
-      saveState();
-      closeWelcome();
+      renderQuestion(); renderHouseScores(); saveState(); closeWelcome();
       window.dispatchEvent(new CustomEvent('legado:welcome:started', { detail: { participant } }));
     });
   }
+
   if (el.welcomeContinue) {
     el.welcomeContinue.addEventListener('click', () => {
       const loaded = loadState();
@@ -304,14 +306,12 @@ function attachWelcomeEvents(){
       }
       if (el.quizArea) el.quizArea.classList.remove('hidden');
       if (el.results) el.results.classList.add('hidden');
-      renderQuestion();
-      renderHouseScores();
-      closeWelcome();
+      renderQuestion(); renderHouseScores(); closeWelcome();
       window.dispatchEvent(new CustomEvent('legado:welcome:continued', { detail: { loaded } }));
     });
   }
 
-  el.welcome.addEventListener('click', onOverlayClick);
+  if (el.welcome) el.welcome.addEventListener('click', onOverlayClick);
   document.addEventListener('keydown', onEsc);
 }
 
@@ -326,9 +326,7 @@ function attachQuizUI(){
       participant = (el.nameInput && el.nameInput.value) || participant || 'Participante';
       idx = 0; pmTotal = 0; answers = {};
       if (el.quizArea) el.quizArea.classList.remove('hidden');
-      renderQuestion();
-      renderHouseScores();
-      saveState();
+      renderQuestion(); renderHouseScores(); saveState();
     });
   }
 }
@@ -336,7 +334,7 @@ function attachQuizUI(){
 
 function init(){
   initTheme();
-  attachThemeListeners();
+  attachThemeHandlers();
   attachWelcomeEvents();
 
   if (el.welcome) {
@@ -349,9 +347,11 @@ function init(){
   const had = loadState();
   if (had) renderHouseScores();
 
+ 
   window.Legado = window.Legado || {};
   window.Legado.openWelcome = openWelcome;
   window.Legado.closeWelcome = closeWelcome;
+  window.Legado.applyTheme = applyTheme;
   window.Legado.saveState = saveState;
   window.Legado.loadState = loadState;
 }

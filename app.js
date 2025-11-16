@@ -1,198 +1,468 @@
-const questions = [
+const PM_FIXO = 10;
+const STORAGE_KEY = "legado_aluno_v1";
+
+
+const RANQUES = [
+  { nome: "Aprendiz", min: 0, max: 2000 },
+  { nome: "Estudante", min: 2001, max: 5000 },
+  { nome: "Pesquisador", min: 5001, max: 9000 },
+  { nome: "Acadêmico", min: 9001, max: 14000 },
+  { nome: "Mentor", min: 14001, max: 20000 },
+  { nome: "Erudito", min: 20001, max: 28000 },
+  { nome: "Filósofo", min: 28001, max: 40000 },
+  { nome: "Sábio", min: 40001, max: 55000 },
+  { nome: "Luminar", min: 55001, max: 80000 },
+  { nome: "Oráculo", min: 80001, max: Infinity }
+];
+
+function calcRanque(pm){
+  const r = RANQUES.find(r => pm >= r.min && pm <= r.max);
+  return r ? r.nome : "—";
+}
+
+
+const VANTAGENS = {
+  "Precursores": {
+    1: [
+      { id: "p1-1", nome: "Chama da Liderança I", bonus: 3, desc: "Se for representante, casa recebe +3 PC" },
+      { id: "p1-2", nome: "Voz da Inspiração I", bonus: 5, desc: "Ao completar atividade coletiva, +5 PC por aluno convidado" },
+      { id: "p1-3", nome: "Força da Determinação I", bonus: 7, desc: "Se aluno com falhas completar semana, +7 PC" }
+    ],
+    2: [
+      { id: "p2-1", nome: "Chama da Liderança II", bonus: 6 },
+      { id: "p2-2", nome: "Voz da Inspiração II", bonus: 7 },
+      { id: "p2-3", nome: "Força da Determinação II", bonus: 12 }
+    ],
+    3: [
+      { id: "p3-1", nome: "Chama da Liderança III", bonus: 10 },
+      { id: "p3-2", nome: "Voz da Inspiração III", bonus: 13 },
+      { id: "p3-3", nome: "Força da Determinação III", bonus: 16 }
+    ],
+    4: [
+      { id: "p4-1", nome: "Bandeira da Coragem I", bonus: 15 },
+      { id: "p4-2", nome: "Rastro do Pioneiro I", bonus: 18 },
+      { id: "p4-3", nome: "Marca Individual I", bonus: 20 }
+    ],
+
+  },
+  "Visionários": {
+    1: [
+      { id: "v1-1", nome: "Faísca Criativa I", bonus: 3, desc: "Apresentar solução original → +3 PC" },
+      { id: "v1-2", nome: "Ousadia Inicial I", bonus: 5 },
+      { id: "v1-3", nome: "Inspiração Compartilhada I", bonus: 7 }
+    ],
+    2: [
+      { id: "v2-1", nome: "Faísca Criativa II", bonus: 6 },
+      { id: "v2-2", nome: "Ousadia Inicial II", bonus: 15 },
+      { id: "v2-3", nome: "Inspiração Compartilhada II", bonus: 10 }
+    ],
+    3: [
+      { id: "v3-1", nome: "Faísca Criativa III", bonus: 9 },
+      { id: "v3-2", nome: "Ousadia II (perfeita)", bonus: 25 },
+      { id: "v3-3", nome: "Inspiração III", bonus: 15 }
+    ],
+    4: [
+      { id: "v4-1", nome: "Laboratório Vivo", bonus: 20 },
+      { id: "v4-2", nome: "Centelha Coletiva", bonus: 18 },
+      { id: "v4-3", nome: "Ousadia Reconhecida", bonus: 20 }
+    ]
+  },
+  "Guardioes": {
+    1: [
+      { id: "g1-1", nome: "Escudo da Disciplina I", bonus: 3 },
+      { id: "g1-2", nome: "Responsabilidade Compartilhada I", bonus: 5 },
+      { id: "g1-3", nome: "Defesa Coletiva I", bonus: 7 }
+    ],
+    2: [
+      { id: "g2-1", nome: "Escudo II", bonus: 6 },
+      { id: "g2-2", nome: "Responsabilidade II", bonus: 9 },
+      { id: "g2-3", nome: "Defesa II", bonus: 12 }
+    ],
+    3: [
+      { id: "g3-1", nome: "Escudo III", bonus: 9 },
+      { id: "g3-2", nome: "Responsabilidade III", bonus: 13 },
+      { id: "g3-3", nome: "Defesa III", bonus: 16 }
+    ],
+    4: [
+      { id: "g4-1", nome: "Código da Honra I", bonus: 12 },
+      { id: "g4-2", nome: "Vigilância Coletiva I", bonus: 16 },
+      { id: "g4-3", nome: "Proteção Constante I", bonus: 20 }
+    ]
+  },
+  "Solidarios": {
+    1: [
+      { id: "s1-1", nome: "Apoio Moral I", bonus: 2 },
+      { id: "s1-2", nome: "Força do Grupo I", bonus: 3 },
+      { id: "s1-3", nome: "Cuidado Contínuo I", bonus: 1 }
+    ],
+    2: [
+      { id: "s2-1", nome: "Apoio Moral II", bonus: 3 },
+      { id: "s2-2", nome: "Força do Grupo II", bonus: 5 },
+      { id: "s2-3", nome: "Cuidado Contínuo II", bonus: 8 }
+    ],
+    3: [
+      { id: "s3-1", nome: "Apoio Moral III", bonus: 5 },
+      { id: "s3-2", nome: "Força do Grupo III", bonus: 8 },
+      { id: "s3-3", nome: "Cuidado Contínuo III", bonus: 12 }
+    ],
+    4: [
+      { id: "s4-1", nome: "Voz Unida", bonus: 6 },
+      { id: "s4-2", nome: "União Inquebrável", bonus: 10 },
+      { id: "s4-3", nome: "Raízes Fortes", bonus: 15 }
+    ]
+  }
+};
+
+
+function ranqueIndexFromPM(pm){
+  const idx = RANQUES.findIndex(r => pm >= r.min && pm <= r.max);
+  return idx >= 0 ? (idx + 1) : 1;
+}
+
+
+function getVantagensDisponiveis(casa, pm){
+  const idx = ranqueIndexFromPM(pm);
+  const houseMap = VANTAGENS[casa] || {};
+
+  if(houseMap[idx]) return houseMap[idx];
+
+  const keys = Object.keys(houseMap).map(k => parseInt(k)).sort((a,b)=>a-b);
+  for(let i = keys.length - 1; i >= 0; i--){
+    if(keys[i] <= idx) return houseMap[keys[i]];
+  }
+
+  return houseMap[keys[0]] || [];
+}
+
+
+let state = {
+  aluno: null,
+  atividadeAtual: {
+    respostas: [],
+    vantagemEscolhida: null
+  },
+  historico: []
+};
+
+function saveState(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+function loadState(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(!raw) return null;
+  try { return JSON.parse(raw); } catch(e) { return null; }
+}
+
+
+const QUESTIONS = [
 
   {
     text: "Qual é o resultado de 7 × 8?",
-    options: [
-      { label: "48", casa: "solidarios" },
-      { label: "56", casa: "precursores" },
-      { label: "64", casa: "visionarios" },
-      { label: "52", casa: "guardioes" },
-    ]
+    options: ["48","56","64","52"]
   },
   {
     text: "Qual é a fração equivalente a 0,5?",
-    options: [
-      { label: "1/2", casa: "visionarios" },
-      { label: "2/3", casa: "solidarios" },
-      { label: "3/5", casa: "precursores" },
-      { label: "4/6", casa: "guardioes" },
-    ]
+    options: ["1/2","2/3","3/5","4/6"]
   },
   {
     text: "Se um carro percorre 240 km em 3 horas, qual é sua velocidade média?",
-    options: [
-      { label: "80 km/h", casa: "guardioes" },
-      { label: "60 km/h", casa: "precursores" },
-      { label: "100 km/h", casa: "visionarios" },
-      { label: "40 km/h", casa: "solidarios" },
-    ]
+    options: ["80 km/h","60 km/h","100 km/h","40 km/h"]
   },
   {
     text: "Qual é o valor de (3² + 4²)?",
-    options: [
-      { label: "25", casa: "solidarios" },
-      { label: "12", casa: "visionarios" },
-      { label: "5", casa: "precursores" },
-      { label: "25", casa: "guardioes" },
-    ]
+    options: ["25","12","5","25"]
   },
   {
     text: "Se um número é dividido por 2 e o resultado é 18, qual é o número?",
-    options: [
-      { label: "34", casa: "visionarios" },
-      { label: "36", casa: "precursores" },
-      { label: "32", casa: "solidarios" },
-      { label: "40", casa: "guardioes" },
-    ]
+    options: ["34","36","32","40"]
   },
-
 
   {
     text: "Qual das frases está escrita corretamente?",
     options: [
-      { label: "Houveram muitas pessoas na festa", casa: "solidarios" },
-      { label: "Fazem dois anos que viajei", casa: "guardioes" },
-      { label: "Faz dois anos que viajei", casa: "precursores" },
-      { label: "Existem muito tempo", casa: "visionarios" },
+      "Houveram muitas pessoas na festa",
+      "Fazem dois anos que viajei",
+      "Faz dois anos que viajei",
+      "Existem muito tempo"
     ]
   },
   {
     text: "Qual é o plural de 'cidadão'?",
-    options: [
-      { label: "Cidadãoses", casa: "visionarios" },
-      { label: "Cidadões", casa: "solidarios" },
-      { label: "Cidadãos", casa: "guardioes" },
-      { label: "Cidadães", casa: "precursores" },
-    ]
+    options: ["Cidadãoses","Cidadões","Cidadãos","Cidadães"]
   },
   {
     text: "Em qual opção há um verbo no pretérito perfeito?",
-    options: [
-      { label: "Eu comerei", casa: "visionarios" },
-      { label: "Eu estudava", casa: "solidarios" },
-      { label: "Eu estudei", casa: "precursores" },
-      { label: "Eu estudaria", casa: "guardioes" },
-    ]
+    options: ["Eu comerei","Eu estudava","Eu estudei","Eu estudaria"]
   },
   {
     text: "Qual alternativa apresenta um advérbio?",
-    options: [
-      { label: "Inteligente", casa: "solidarios" },
-      { label: "Felizmente", casa: "visionarios" },
-      { label: "Bonito", casa: "guardioes" },
-      { label: "Menino", casa: "precursores" },
-    ]
+    options: ["Inteligente","Felizmente","Bonito","Menino"]
   },
   {
     text: "Assinale a opção com acentuação correta:",
-    options: [
-      { label: "Ideia", casa: "solidarios" },
-      { label: "Heróico", casa: "visionarios" },
-      { label: "Pôe-se", casa: "precursores" },
-      { label: "Vôo", casa: "guardioes" },
-    ]
+    options: ["Ideia","Heróico","Pôe-se","Vôo"]
   }
 ];
 
 
-let currentQuestionIndex = 0;
-const scores = {
-  precursores: 0,
-  visionarios: 0,
-  guardioes: 0,
-  solidarios: 0
+const el = {
+  setup: document.getElementById("setup"),
+  name: document.getElementById("name"),
+  house: document.getElementById("house"),
+  pmStart: document.getElementById("pm-start"),
+  btnStart: document.getElementById("btn-start"),
+  btnLoad: document.getElementById("btn-load"),
+
+  vantagensSection: document.getElementById("vantagens"),
+  vantagensList: document.getElementById("vantagens-list"),
+
+  quizSection: document.getElementById("quiz"),
+  questionText: document.getElementById("question-text"),
+  options: document.getElementById("options"),
+  prevBtn: document.getElementById("prev-btn"),
+  nextBtn: document.getElementById("next-btn"),
+  progress: document.getElementById("progress"),
+  submitActivity: document.getElementById("submit-activity"),
+  resetBtn: document.getElementById("reset-btn"),
+
+  historySection: document.getElementById("history"),
+  historyList: document.getElementById("history-list"),
+  clearStorage: document.getElementById("clear-storage"),
+
+  uName: document.getElementById("u-name"),
+  uHouse: document.getElementById("u-house"),
+  uPM: document.getElementById("u-pm"),
+  uPC: document.getElementById("u-pc"),
+  uRanque: document.getElementById("u-ranque"),
+  userSummary: document.getElementById("user-summary")
 };
 
 
-const questionTextEl = document.getElementById('question-text');
-const prevBtn = document.getElementById('prev-btn');
-const nextBtn = document.getElementById('next-btn');
-const submitBtn = document.getElementById('submit-btn');
-const resultsSection = document.getElementById('results');
-const restartBtn = document.getElementById('restart-btn');
+let qIndex = 0;
 
-const scorePrecursoresEl = document.getElementById('score-precursores');
-const scoreVisionariosEl = document.getElementById('score-visionarios');
-const scoreGuardioesEl = document.getElementById('score-guardioes');
-const scoreSolidariosEl = document.getElementById('score-solidarios');
+function renderQuestion(){
+  const q = QUESTIONS[qIndex];
+  el.questionText.textContent = q.text;
+  el.options.innerHTML = "";
+  q.options.forEach((opt, i) => {
+    const b = document.createElement("div");
+    b.className = "opt";
+    b.textContent = opt;
+    b.dataset.index = i;
+    b.addEventListener("click", () => {
 
-const finalPrecursores = document.getElementById('final-precursores');
-const finalVisionarios = document.getElementById('final-visionarios');
-const finalGuardioes = document.getElementById('final-guardioes');
-const finalSolidarios = document.getElementById('final-solidarios');
+      state.atividadeAtual.respostas[qIndex] = opt;
 
-
-function renderQuestion() {
-  const q = questions[currentQuestionIndex];
-  questionTextEl.textContent = q.text;
-
-  const container = document.getElementById('question-container');
-  while (container.children.length > 1) {
-    container.removeChild(container.lastChild);
-  }
-
-  q.options.forEach(opt => {
-    const btn = document.createElement('button');
-    btn.textContent = opt.label;
-    btn.className = 'btn btn--nav';
-    btn.addEventListener('click', () => {
-      scores[opt.casa]++;
-      updateScores();
-      if (currentQuestionIndex < questions.length - 1) {
-        currentQuestionIndex++;
+      if(qIndex < QUESTIONS.length - 1){
+        qIndex++;
         renderQuestion();
       } else {
-        showResults();
+
+        renderQuestion();
       }
+      renderProgress();
     });
-    container.appendChild(btn);
+    el.options.appendChild(b);
   });
-
-  prevBtn.disabled = currentQuestionIndex === 0;
-  nextBtn.disabled = currentQuestionIndex === questions.length - 1;
+  renderProgress();
 }
 
-
-function updateScores() {
-  scorePrecursoresEl.textContent = scores.precursores;
-  scoreVisionariosEl.textContent = scores.visionarios;
-  scoreGuardioesEl.textContent = scores.guardioes;
-  scoreSolidariosEl.textContent = scores.solidarios;
+function renderProgress(){
+  el.progress.textContent = `${qIndex+1} / ${QUESTIONS.length}`;
+  el.prevBtn.disabled = qIndex === 0;
+  el.nextBtn.disabled = qIndex === QUESTIONS.length - 1;
 }
 
-
-function showResults() {
-  resultsSection.style.display = "block";
-  finalPrecursores.textContent = scores.precursores;
-  finalVisionarios.textContent = scores.visionarios;
-  finalGuardioes.textContent = scores.guardioes;
-  finalSolidarios.textContent = scores.solidarios;
-}
-
-
-function restartQuiz() {
-  currentQuestionIndex = 0;
-  for (let key in scores) scores[key] = 0;
-  updateScores();
-  resultsSection.style.display = "none";
+el.prevBtn.addEventListener("click", () => {
+  if(qIndex > 0){ qIndex--; renderQuestion(); }
+});
+el.nextBtn.addEventListener("click", () => {
+  if(qIndex < QUESTIONS.length - 1){ qIndex++; renderQuestion(); }
+});
+el.resetBtn.addEventListener("click", () => {
+  state.atividadeAtual = { respostas: [], vantagemEscolhida: null };
+  qIndex = 0;
   renderQuestion();
+  renderVantagens();
+});
+
+
+el.btnStart.addEventListener("click", () => {
+  const nome = el.name.value.trim();
+  const casa = el.house.value;
+  const pmInit = Math.max(0, parseInt(el.pmStart.value || "0"));
+  if(!nome){ alert("Digite o nome do aluno."); return; }
+
+  state.aluno = {
+    nome,
+    casa,
+    pm: pmInit,
+    pc: 0,
+    vantagensAtivas: { /* não persistir escolhas permanentes aqui e cada atividade pode aplicar vantagem */ }
+  };
+
+  state.historico = state.historico || [];
+  state.atividadeAtual = { respostas: [], vantagemEscolhida: null };
+
+  saveState();
+
+  setupAfterInit();
+});
+
+el.btnLoad.addEventListener("click", () => {
+  const loaded = loadState();
+  if(!loaded || !loaded.aluno){ alert("Nenhum aluno salvo no localStorage."); return; }
+  state = loaded;
+  setupAfterInit();
+});
+
+
+function updateUserSummary(){
+  if(!state.aluno) return;
+  el.userSummary.style.display = "block";
+  el.uName.textContent = state.aluno.nome;
+  el.uHouse.textContent = state.aluno.casa;
+  el.uPM.textContent = state.aluno.pm;
+  el.uPC.textContent = state.aluno.pc;
+  el.uRanque.textContent = calcRanque(state.aluno.pm);
 }
 
 
-prevBtn.addEventListener("click", () => {
-  if (currentQuestionIndex > 0) {
-    currentQuestionIndex--;
-    renderQuestion();
+function renderVantagens(){
+  if(!state.aluno) return;
+  const casa = state.aluno.casa;
+  const pm = state.aluno.pm;
+  const ranqueIdx = ranqueIndexFromPM(pm);
+  const disponiveis = getVantagensDisponiveis(casa, pm);
+
+  el.vantagensList.innerHTML = "";
+  if(!disponiveis || disponiveis.length === 0){
+    el.vantagensList.innerHTML = "<div class='muted small'>Nenhuma vantagem disponível para seu ranque.</div>";
+    return;
   }
-});
-nextBtn.addEventListener("click", () => {
-  if (currentQuestionIndex < questions.length - 1) {
-    currentQuestionIndex++;
-    renderQuestion();
-  }
-});
-restartBtn.addEventListener("click", restartQuiz);
+
+  disponiveis.forEach(v => {
+    const div = document.createElement("div");
+    div.className = "vantagem";
+    div.innerHTML = `<div><strong>${v.nome}</strong></div>
+                     <div class="muted small">${v.desc || ""}</div>
+                     <div class="muted small">Bônus PC: +${v.bonus}</div>`;
+    const btn = document.createElement("button");
+    btn.className = "btn";
+    btn.textContent = (state.atividadeAtual.vantagemEscolhida && state.atividadeAtual.vantagemEscolhida.id === v.id) ? "Selecionado ✓" : "Escolher";
+    btn.addEventListener("click", () => {
+
+      state.atividadeAtual.vantagemEscolhida = v;
+      saveState();
+      renderVantagens();
+    });
+    div.appendChild(btn);
+    el.vantagensList.appendChild(div);
+  });
+}
 
 
-renderQuestion();
-updateScores();
+el.submitActivity.addEventListener("click", () => {
+  if(!state.aluno){ alert("Nenhum aluno ativo."); return; }
+
+
+  state.aluno.pm += PM_FIXO;
+
+
+  let bonus = 0;
+  if(state.atividadeAtual.vantagemEscolhida){
+    bonus = state.atividadeAtual.vantagemEscolhida.bonus || 0;
+    state.aluno.pc += bonus;
+  }
+
+
+  const now = new Date().toISOString();
+  const entry = {
+    ts: now,
+    atividade: {
+      perguntas: QUESTIONS.length,
+      respostas: state.atividadeAtual.respostas.slice(),
+      pmRecebidos: PM_FIXO,
+      pcRecebidos: bonus,
+      vantagem: state.atividadeAtual.vantagemEscolhida ? state.atividadeAtual.vantagemEscolhida.nome : null,
+      ranqueApós: calcRanque(state.aluno.pm)
+    }
+  };
+  state.historico = state.historico || [];
+  state.historico.unshift(entry);
+
+
+  state.atividadeAtual = { respostas: [], vantagemEscolhida: null };
+
+  saveState();
+  updateUserSummary();
+  renderVantagens();
+  renderHistory();
+
+  alert(`Atividade concluída!
++${PM_FIXO} PM
++${bonus} PC (vantagem aplicada)
+Ranque atual: ${calcRanque(state.aluno.pm)}
+`);
+
+
+  qIndex = 0;
+  renderQuestion();
+});
+
+
+function renderHistory(){
+  el.historySection.style.display = "block";
+  el.historyList.innerHTML = "";
+  (state.historico || []).forEach(h => {
+    const d = document.createElement("div");
+    d.className = "history-item";
+    d.innerHTML = `<div><strong>${new Date(h.ts).toLocaleString()}</strong></div>
+                   <div>PM ganhos: ${h.atividade.pmRecebidos} · PC ganhos: ${h.atividade.pcRecebidos}</div>
+                   <div>Vantagem: ${h.atividade.vantagem || "—"}</div>
+                   <div>Ranque agora: ${h.atividade.ranqueApós}</div>`;
+    el.historyList.appendChild(d);
+  });
+}
+
+el.clearStorage.addEventListener("click", () => {
+  if(!confirm("Limpar todos os dados do protótipo (localStorage)?")) return;
+  localStorage.removeItem(STORAGE_KEY);
+  location.reload();
+});
+
+
+function setupAfterInit(){
+
+  el.setup.style.display = "none";
+  el.vantagensSection.style.display = "block";
+  el.quizSection.style.display = "block";
+  el.historySection.style.display = "block";
+  updateUserSummary();
+  renderVantagens();
+  renderQuestion();
+  renderHistory();
+}
+
+
+window.addEventListener("load", () => {
+  const loaded = loadState();
+  if(loaded && loaded.aluno){
+    state = loaded;
+
+  }
+  renderQuestion();
+});
+
+
+function loadState(){
+  return loadStateRaw();
+}
+function loadStateRaw(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(!raw) return null;
+  try { return JSON.parse(raw); } catch(e) { return null; }
+}
+function saveState(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}

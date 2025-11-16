@@ -417,3 +417,68 @@ function showAchievementToast(name) {
 function totalActivities() {
   return Number(localStorage.getItem("atividades_completas") || 0);
 }
+
+/**********************************
+ * CONFIGURADOR DO MESTRE
+ **********************************/
+let PM_ATIVIDADE = Number(localStorage.getItem("cfg_pm")) || 10;
+let XP_NEEDED = Number(localStorage.getItem("cfg_xp")) || 100;
+let MULTIPLICADORES_ATIVOS = localStorage.getItem("cfg_mult") !== "off";
+
+const configBtn = document.getElementById("config-btn");
+const configPanel = document.getElementById("config-panel");
+const closeConfig = document.getElementById("close-config");
+const applyCfg = document.getElementById("apply-cfg");
+const resetCfg = document.getElementById("reset-cfg");
+const simulateCfg = document.getElementById("simulate-cfg");
+
+const cfgPM = document.getElementById("cfg-pm");
+const cfgXP = document.getElementById("cfg-xp");
+const cfgMult = document.getElementById("cfg-mult");
+
+configBtn.addEventListener("click", () => {
+  configPanel.classList.toggle("hidden");
+  loadSettings();
+});
+
+closeConfig.addEventListener("click", () => {
+  configPanel.classList.add("hidden");
+});
+
+applyCfg.addEventListener("click", () => {
+  saveSettings();
+  alert("Configurações salvas!");
+});
+
+resetCfg.addEventListener("click", () => {
+  localStorage.removeItem("cfg_pm");
+  localStorage.removeItem("cfg_xp");
+  localStorage.removeItem("cfg_mult");
+  alert("Configurações restauradas aos padrões.");
+  location.reload();
+});
+
+simulateCfg.addEventListener("click", () => {
+  alert(`
+SIMULAÇÃO:
+PM por atividade: ${PM_ATIVIDADE}
+XP por nível: ${XP_NEEDED}
+Multiplicadores: ${MULTIPLICADORES_ATIVOS ? "ATIVOS" : "DESLIGADOS"}
+  `);
+});
+
+function loadSettings() {
+  cfgPM.value = PM_ATIVIDADE;
+  cfgXP.value = XP_NEEDED;
+  cfgMult.value = MULTIPLICADORES_ATIVOS ? "on" : "off";
+}
+
+function saveSettings() {
+  localStorage.setItem("cfg_pm", cfgPM.value);
+  localStorage.setItem("cfg_xp", cfgXP.value);
+  localStorage.setItem("cfg_mult", cfgMult.value);
+
+  PM_ATIVIDADE = Number(cfgPM.value);
+  XP_NEEDED = Number(cfgXP.value);
+  MULTIPLICADORES_ATIVOS = cfgMult.value === "on";
+}

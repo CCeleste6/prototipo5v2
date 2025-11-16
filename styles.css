@@ -6,86 +6,139 @@
 }
 
 body {
-  background: #f4f4f4;
-  padding: 30px;
+  background: linear-gradient(120deg, #0c1017, #1b293a, #06121d);
+  min-height: 100vh;
+  padding: 40px;
+  color: white;
+}
+
+.wrapper {
+  max-width: 900px;
+  margin: auto;
 }
 
 
-header {
+.header {
   text-align: center;
   margin-bottom: 40px;
 }
 
-h1 {
-  font-size: 40px;
-  font-weight: 900;
-}
-
-h2 {
-  margin-top: 10px;
-  font-size: 22px;
-  font-weight: bold;
-}
-
-
 .rank-badge {
   width: 200px;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 1/1;
   object-fit: cover;
   object-position: top;
   overflow: hidden;
   display: block;
-  margin: 20px auto;
-  filter: drop-shadow(0px 4px 10px rgba(0,0,0,0.2));
+  margin: 0 auto;
+  filter: drop-shadow(0px 0px 20px rgba(255,255,255,0.4));
+}
+
+.title {
+  font-size: 50px;
+  font-weight: 800;
+  margin-top: 15px;
+  letter-spacing: 1px;
+  text-shadow: 0 0 12px rgba(255,255,255,0.5);
+}
+
+.rank-name {
+  margin-top: 5px;
+  font-size: 24px;
+  font-weight: 600;
+  opacity: 0.9;
 }
 
 
-.painel {
-  background: white;
-  padding: 20px;
-  border-radius: 14px;
-  margin-bottom: 32px;
-  border: 2px solid #ccc;
+.card {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.1);
+  backdrop-filter: blur(12px);
+  padding: 25px;
+  border-radius: 18px;
+  margin-bottom: 35px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  transition: 0.3s;
 }
 
-.painel h3 {
-  font-size: 22px;
-  margin-bottom: 10px;
+.card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255,255,255,0.28);
 }
+
+.card-title {
+  font-size: 24px;
+  margin-bottom: 12px;
+  border-bottom: 2px solid rgba(255,255,255,0.15);
+  padding-bottom: 5px;
+}
+
+.card-subtitle {
+  opacity: 0.8;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
 
 .pergunta {
   margin-bottom: 24px;
 }
 
 .pergunta p {
-  font-weight: bold;
-  margin-bottom: 8px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.pergunta label {
+  display: block;
+  padding: 6px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.pergunta label:hover {
+  background: rgba(255,255,255,0.1);
 }
 
 
-.btn-finalizar {
+#vantagens-list label {
   display: block;
-  margin: 30px auto;
-  padding: 14px 32px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+#vantagens-list label:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+
+.btn-primary {
+  display: block;
+  margin: 35px auto;
+  padding: 16px 32px;
   font-size: 20px;
   font-weight: bold;
-  background: #23a134;
-  color: white;
+  background: linear-gradient(90deg, #0aff9d, #2af9ff);
   border: none;
-  border-radius: 12px;
+  border-radius: 14px;
+  color: #001714;
   cursor: pointer;
-  transition: 0.3s;
+  transition: 0.25s;
+  box-shadow: 0 0 18px rgba(0,255,200,0.4);
 }
 
-.btn-finalizar:hover {
-  background: #1c812a;
+.btn-primary:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 25px rgba(0,255,200,0.8);
 }
 
 
-footer {
-  margin-top: 35px;
+.footer {
+  margin-top: 50px;
   text-align: center;
-  padding-top: 20px;
-  font-size: 14px;
-  opacity: 0.65;
+  font-size: 13px;
+  opacity: 0.5;
 }

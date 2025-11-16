@@ -233,3 +233,45 @@ function exportCSV() {
   a.download = "legado_dados.csv";
   a.click();
 }
+
+
+/******************************
+ * PAINEL DO ALUNO (XP SYSTEM)
+ *****************************/
+const studentBtn = document.getElementById("student-btn");
+const studentPanel = document.getElementById("student-panel");
+const closeStudent = document.getElementById("close-student");
+const xpFill = document.getElementById("xp-fill");
+const xpText = document.getElementById("xp-text");
+const studentSummary = document.getElementById("student-summary");
+
+let xp = Number(localStorage.getItem("xp") || 0);
+
+const XP_NEEDED = 100; // you can adjust this later
+
+studentBtn.addEventListener("click", () => {
+  studentPanel.classList.toggle("hidden");
+  updateXPDisplay();
+});
+
+closeStudent.addEventListener("click", () => {
+  studentPanel.classList.add("hidden");
+});
+
+function addXP(amount) {
+  xp += amount;
+  localStorage.setItem("xp", xp);
+  updateXPDisplay();
+}
+
+function updateXPDisplay() {
+  const progress = Math.min((xp % XP_NEEDED) / XP_NEEDED * 100, 100);
+  xpFill.style.width = progress + "%";
+
+  xpText.textContent = `${xp % XP_NEEDED}/${XP_NEEDED} XP para próxima evolução`;
+
+  studentSummary.textContent = `
+    XP total: ${xp}
+    | Level interno: ${Math.floor(xp / XP_NEEDED)}
+  `;
+}

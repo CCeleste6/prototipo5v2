@@ -1,53 +1,96 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LEGADO ESCOLAR · Quiz PM / PC</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Legado Escolar — Protótipo</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-
   <header class="header">
-    <h1 class="header__title">LEGADO ESCOLAR</h1>
-    <p class="header__subtitle">Quiz PM · PC</p>
-    <button id="save-progress" class="btn btn--small">Salvar</button>
+    <div class="header__left">
+      <h1>LEGADO ESCOLAR</h1>
+      <p class="muted">Protótipo — Atividade / Vantagens / PM & PC</p>
+    </div>
+    <div class="header__right">
+      <div id="user-summary" class="user-summary" style="display:none">
+        <div><strong id="u-name"></strong></div>
+        <div id="u-house"></div>
+        <div>PM: <span id="u-pm">0</span> · PC: <span id="u-pc">0</span></div>
+        <div>Ranque: <span id="u-ranque">—</span></div>
+      </div>
+    </div>
   </header>
 
-  <main class="quiz-container">
-    <section class="scores">
-      <div class="score">Precursores: <span id="score-precursores">0</span></div>
-      <div class="score">Visionários: <span id="score-visionarios">0</span></div>
-      <div class="score">Guardiões: <span id="score-guardioes">0</span></div>
-      <div class="score">Solidários: <span id="score-solidarios">0</span></div>
+  <main class="main">
+
+    <section id="setup" class="card">
+      <h2>Antes de começar</h2>
+      <div class="form-row">
+        <label for="name">Nome do aluno</label>
+        <input id="name" type="text" placeholder="Digite seu nome" />
+      </div>
+      <div class="form-row">
+        <label for="house">Casa</label>
+        <select id="house">
+          <option value="Precursores">Precursores</option>
+          <option value="Visionários">Visionários</option>
+          <option value="Guardioes">Guardiões</option>
+          <option value="Solidarios">Solidários</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label for="pm-start">PM inicial (opcional)</label>
+        <input id="pm-start" type="number" min="0" placeholder="0" />
+      </div>
+      <div class="row">
+        <button id="btn-start" class="btn btn-primary">Iniciar atividade</button>
+        <button id="btn-load" class="btn btn-secondary">Carregar último aluno</button>
+      </div>
+      <p class="muted small">Depois de iniciar, você poderá escolher vantagem (se disponível) e responder às 10 perguntas.</p>
     </section>
 
-    <section class="quiz">
-      <div id="question-container" class="question-container">
-        <!-- Aqui vai a pergunta carregada via JS -->
-        <p id="question-text" class="question-text">Carregando pergunta...</p>
+
+    <section id="vantagens" class="card" style="display:none;">
+      <h2>Vantagens disponíveis</h2>
+      <div id="vantagens-list" class="vantagens-list">
+
       </div>
-      <div class="navigation">
-        <button id="prev-btn" class="btn btn--nav">Anterior</button>
-        <button id="next-btn" class="btn btn--nav">Próxima</button>
-        <button id="submit-btn" class="btn btn--primary">Enviar Resposta</button>
+      <p class="muted small">Escolha <strong>uma</strong> vantagem para aplicar nesta atividade (opcional). A vantagem, se ativada, concederá PC quando você finalizar a atividade.</p>
+    </section>
+
+
+    <section id="quiz" class="card" style="display:none;">
+      <h2>Atividade — Quiz</h2>
+      <div id="question-area" class="question-area">
+        <p id="question-text">Carregando...</p>
+        <div id="options" class="options"></div>
+      </div>
+
+      <div class="controls">
+        <button id="prev-btn" class="btn">Anterior</button>
+        <div class="progress" id="progress">0 / 10</div>
+        <button id="next-btn" class="btn">Próxima</button>
+      </div>
+
+      <div class="row" style="margin-top:1rem;">
+        <button id="submit-activity" class="btn btn-primary">Enviar atividade (concluir)</button>
+        <button id="reset-btn" class="btn btn-secondary">Reiniciar atividade</button>
       </div>
     </section>
 
-    <section class="results" id="results" style="display: none;">
-      <h2>Resultados</h2>
-      <div class="final-scores">
-        <div>Precursores: <span id="final-precursores">0</span></div>
-        <div>Visionários: <span id="final-visionarios">0</span></div>
-        <div>Guardiões: <span id="final-guardioes">0</span></div>
-        <div>Solidários: <span id="final-solidarios">0</span></div>
+
+    <section id="history" class="card" style="display:none;">
+      <h2>Histórico</h2>
+      <div id="history-list"></div>
+      <div class="row">
+        <button id="clear-storage" class="btn btn-danger">Limpar dados (localStorage)</button>
       </div>
-      <button id="restart-btn" class="btn btn--secondary">Reiniciar</button>
     </section>
   </main>
 
   <footer class="footer">
-    <p>Nenhum progresso salvo</p>
+    <small>Protótipo — Legado Escolar • PM fixo por atividade • As respostas do quiz NÃO definem PM</small>
   </footer>
 
   <script src="app.js"></script>

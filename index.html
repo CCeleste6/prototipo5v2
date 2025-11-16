@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Legado Escolar — Quiz PM / PC</title>
 
-
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-
 
   <link rel="icon" href="logo-optimized.jpeg" />
 
@@ -15,7 +13,7 @@
 </head>
 <body>
 
-  <div id="welcome" class="overlay">
+  <div id="welcome" class="overlay" aria-hidden="true">
     <div class="welcome-card" role="dialog" aria-labelledby="welcome-title">
       <picture>
         <img src="logo-optimized.jpeg" alt="Legado Escolar" class="welcome-logo" />
@@ -32,7 +30,7 @@
       <div class="welcome-footer">
         <label class="theme-switch">
           <input type="checkbox" id="theme-toggle" aria-label="Alternar tema" />
-          <span>Modo claro</span>
+          <span id="theme-toggle-label">Modo claro</span>
         </label>
       </div>
     </div>
@@ -55,7 +53,7 @@
 
         <label class="theme-switch-inline">
           <input type="checkbox" id="theme-toggle-inline" aria-label="Alternar tema" />
-          <span>Modo claro</span>
+          <span id="theme-toggle-inline-label">Modo claro</span>
         </label>
       </div>
     </header>
@@ -115,7 +113,6 @@
       <small>Legado Escolar · Sistema de pontuação educacional</small>
     </footer>
   </main>
-
 
   <script type="module" src="apps.js"></script>
 </body>

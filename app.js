@@ -482,3 +482,89 @@ function saveSettings() {
   XP_NEEDED = Number(cfgXP.value);
   MULTIPLICADORES_ATIVOS = cfgMult.value === "on";
 }
+
+/********************************************
+ * INVENTÁRIO / HISTÓRICO DE VANTAGENS
+ ********************************************/
+const inventoryBtn = document.getElementById("inventory-btn");
+const inventoryPanel = document.getElementById("inventory-panel");
+const closeInventory = document.getElementById("close-inventory");
+const inventoryList = document.getElementById("inventory-list");
+const clearInventoryBtn = document.getElementById("clear-inventory");
+const exportInventoryBtn = document.getElementById("export-inventory");
+
+inventoryBtn.addEventListener("click", () => {
+  inventoryPanel.classList.toggle("hidden");
+  renderInventory();
+});
+
+closeInventory.addEventListener("click", () => {
+  inventoryPanel.classList.add("hidden");
+});
+
+clearInventoryBtn.addEventListener("click", () => {
+  if (confirm("Tem certeza que quer apagar todo o histórico?")) {
+    localStorage.removeItem("inventory");
+    renderInventory();
+    alert("Inventário apagado");
+  }
+});
+
+exportInventoryBtn.addEventListener("click", exportInventory);
+
+/********************************************
+ * CORE FUNCTIONS
+ ********************************************/
+function addToInventory(casa, vantagemObj) {
+  const log = JSON.parse(localStorage.getItem("inventory") || "[]");
+
+  log.push({
+    id: Date.now(),
+    casa,
+    vantagem: vantagemObj.nome,
+    bonus: vantagemObj.bonus || 0,
+    multiplier: vantagemObj.multiplier || null,
+    timestamp: new Date().toISOString()
+  });
+
+  localStorage.setItem("inventory", JSON.stringify(log));
+}
+
+function renderInventory() {
+  const log = JSON.parse(localStorage.getItem("inventory") || "[]");
+
+  if (log.length === 0) {
+    inventoryList.innerHTML = "<li>Nenhuma vantagem registrada ainda.</li>";
+    return;
+  }
+
+  inventoryList.innerHTML = log
+    .slice()
+    .reverse()
+    .map(item => `
+      <li>
+        <b>${item.vantagem}</b> — ${item.casa}
+        <br>
+        ${item.multiplier ? `Multiplicador x${item.multiplier}` : `+${item.bonus} PC`}
+        <br>
+        <small>${new Date(item.timestamp).toLocaleString("pt-BR")}</small>
+      </li>
+    `)
+    .join("");
+}
+
+function exportInventory() {
+  const log = JSON.parse(localStorage.getItem("inventory") || "[]");
+  if (!log.length) return alert("Nada para exportar!");
+
+  let csv = "casa,vantagem,bonus,multiplicador,timestamp\n";
+  log.forEach(item => {
+    csv += `"${item.casa}","${item.vantagem}",${item.bonus},${item.multiplier || ""},"${item.timestamp}"\n`;
+  });
+
+  const blob = new Blob([csv], {type:"text/csv"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "inventario_legado.csv";
+  a.click();
+}

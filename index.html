@@ -1,60 +1,110 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Legado Escolar</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>prototipo5v2 - Legado Escolar</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <header>
+    <h1>Legado Escolar — Protótipo</h1>
+  </header>
 
-  <h1 class="title">LEGADO ESCOLAR</h1>
+  <main class="container">
+    <section class="panel" id="setup-panel">
+      <h2>Configurar Aluno</h2>
+      <label>Nome: <input id="input-nome" /></label>
+      <label>Casa:
+        <select id="input-casa">
+          <option>Precursores</option>
+          <option>Visionários</option>
+          <option>Guardiões</option>
+          <option>Solidários</option>
+        </select>
+      </label>
+      <button id="btn-criar">Criar / Carregar aluno</button>
+    </section>
 
-  <!--Painel do Mestre-->
-  <section id="painel-mestre" class="card">
-    <h2>🎓 Painel do Mestre</h2>
-    <input id="nomeAluno" placeholder="Nome do aluno">
-    <select id="casaAluno">
-      <option>Precursores</option>
-      <option>Visionários</option>
-      <option>Guardiões</option>
-      <option>Solidários</option>
-    </select>
-    <button onclick="criarAluno()">Criar aluno</button>
+    <section class="panel" id="aluno-panel" hidden>
+      <div class="aluno-top">
+        <img id="rank-badge" alt="brasão" class="badge"/>
+        <div>
+          <h2 id="aluno-nome">—</h2>
+          <div id="aluno-casa">—</div>
+          <div id="aluno-rank">—</div>
+        </div>
+      </div>
 
-    <button onclick="exportarCSV()">Exportar CSV</button>
-    <button onclick="resetSistema()" class="danger">Resetar Sistema</button>
-  </section>
+      <div class="stats">
+        <div>PM: <span id="aluno-pm">0</span></div>
+        <div>PC: <span id="aluno-pc">0</span></div>
+        <div>XP: <span id="aluno-xp">0</span> (<span id="aluno-lvl">0</span>)</div>
+        <div id="xp-bar"><div id="xp-fill"></div></div>
+      </div>
 
-  <!-- Painel do Aluno -->
-  <section id="painel-aluno" class="card">
-    <h2>👤 Painel do Aluno</h2>
-    <select id="selectAluno" onchange="renderAluno()"></select>
+      <div class="actions">
+        <button id="btn-iniciar-quiz">Iniciar Quiz</button>
+        <button id="btn-vantagens">Vantagens</button>
+        <button id="btn-inventario">Inventário</button>
+        <button id="btn-ranking">Ranking</button>
+        <button id="btn-config">Configurar</button>
+      </div>
+    </section>
 
-    <div id="dadosAluno"></div>
+    <section class="panel" id="quiz-panel" hidden>
+      <h2>Quiz — 10 perguntas</h2>
+      <form id="quiz-form"></form>
+      <div class="quiz-actions">
+        <button id="btn-submit-quiz" type="button">Enviar respostas</button>
+        <button id="btn-cancel-quiz" type="button">Cancelar</button>
+      </div>
+    </section>
 
-    <button onclick="ganharPM()">+ Atividade (PM)</button>
-    <button onclick="ganharXP()">+ XP</button>
+    <section class="panel" id="vantagens-panel" hidden>
+      <h2>Escolher Vantagens (1 por ranque disponível)</h2>
+      <div id="vantagens-list"></div>
+      <div class="panel-actions">
+        <button id="btn-save-vantagens">Salvar escolhas</button>
+        <button id="btn-close-vantagens">Fechar</button>
+      </div>
+    </section>
 
-    <h3>Vantagens Disponíveis</h3>
-    <div id="vantagens"></div>
+    <section class="panel" id="inventario-panel" hidden>
+      <h2>Inventário / Histórico de Vantagens</h2>
+      <ul id="inventario-list"></ul>
+      <div class="panel-actions">
+        <button id="btn-export-inv">Exportar CSV</button>
+        <button id="btn-clear-inv">Limpar</button>
+        <button id="btn-close-inv">Fechar</button>
+      </div>
+    </section>
 
-    <h3>Inventário</h3>
-    <div id="inventario"></div>
-  </section>
+    <section class="panel" id="ranking-panel" hidden>
+      <h2>Ranking</h2>
+      <h3>Alunos</h3><ul id="ranking-alunos"></ul>
+      <h3>Casas</h3><ul id="ranking-casas"></ul>
+      <div class="panel-actions"><button id="btn-close-ranking">Fechar</button></div>
+    </section>
 
-  <!-- Ranking -->
-  <button id="ranking-btn" class="ranking-toggle">📊 Ranking</button>
-  <div id="ranking-panel" class="ranking-panel hidden">
-    <h3>Ranking de Alunos</h3>
-    <ul id="ranking-alunos"></ul>
+    <section class="panel" id="config-panel" hidden>
+      <h2>Configurações</h2>
+      <label>PM fixo por atividade: <input id="cfg-pm" type="number" min="0" /></label>
+      <label>XP por acerto: <input id="cfg-xp-per" type="number" min="1" /></label>
+      <label>XP para evoluir (base): <input id="cfg-xp-needed" type="number" min="10" /></label>
+      <div class="panel-actions">
+        <button id="btn-save-config">Salvar</button>
+        <button id="btn-close-config">Fechar</button>
+      </div>
+    </section>
 
-    <h3>Ranking de Casas</h3>
-    <ul id="ranking-casas"></ul>
+  </main>
 
-    <button id="close-ranking">Fechar</button>
-  </div>
+  <footer>
+    <small>Protótipo: manter em localhost / GitHub Pages</small>
+  </footer>
 
+  <!-- Vantagens (definido por arquivo externo) -->
   <script src="VANTAGENS.js"></script>
   <script src="app.js"></script>
 </body>

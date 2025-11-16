@@ -93,5 +93,33 @@
   <button id="close-achievements" class="btn-secondary">Fechar</button>
 </div>
 
+  <button id="config-btn" class="config-toggle">🛠 Configurações</button>
+
+<div id="config-panel" class="config-panel hidden">
+  <h3>Configuração do Sistema</h3>
+
+  <label>PM por Atividade:</label>
+  <input id="cfg-pm" type="number">
+
+  <label>XP necessário por nível:</label>
+  <input id="cfg-xp" type="number">
+
+  <label>Multiplicadores ativados:</label>
+  <select id="cfg-mult">
+    <option value="on">Ligados</option>
+    <option value="off">Desligados</option>
+  </select>
+
+  <button id="apply-cfg" class="btn-secondary">Salvar Configurações</button>
+
+  <hr style="margin:12px 0">
+  
+  <button id="simulate-cfg" class="btn-secondary">Rodar Simulação</button>
+
+  <button id="reset-cfg" class="btn-danger">Resetar Configurações</button>
+
+  <button id="close-config" class="btn-secondary">Fechar</button>
+</div>
+
 </body>
 </html>

@@ -2,34 +2,39 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <title>Legado Escolar | Protótipo</title>
+  <title>Legado Escolar | Modo Deluxe</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
+  <div class="wrapper">
 
-  <header>
-    <h1>LEGADO ESCOLAR</h1>
-    <h2 id="rank-display"></h2>
-    <img id="rank-badge" class="rank-badge">
-  </header>
+    <header class="header">
+      <img id="rank-badge" class="rank-badge" />
+      <h1 class="title">Legado Escolar</h1>
+      <h2 id="rank-display" class="rank-name"></h2>
+    </header>
 
-  <section class="painel">
-    <h3>Quiz da Atividade</h3>
-    <div id="quiz"></div>
-  </section>
+    <main>
+      <section class="card">
+        <h3 class="card-title">Quiz da Atividade</h3>
+        <div id="quiz"></div>
+      </section>
 
-  <section class="painel">
-    <h3>Vantagens Disponíveis</h3>
-    <p>Selecione as vantagens que deseja aplicar nesta atividade:</p>
-    <div id="vantagens-list"></div>
-  </section>
+      <section class="card">
+        <h3 class="card-title">Vantagens Disponíveis</h3>
+        <p class="card-subtitle">Escolha as vantagens que deseja ativar:</p>
+        <div id="vantagens-list"></div>
+      </section>
 
-  <button id="finish-btn" class="btn-finalizar">Finalizar Atividade</button>
+      <button id="finish-btn" class="btn-primary">Finalizar Atividade</button>
+    </main>
 
-  <footer>
-    <p>Protótipo Oficial - Legado Escolar</p>
-  </footer>
+    <footer class="footer">
+      Protótipo Oficial — Legado Escolar (Modo Deluxe)
+    </footer>
+
+  </div>
 
   <script src="VANTAGENS.js"></script>
   <script src="app.js"></script>
